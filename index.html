@@ -6,7 +6,31 @@
 <title>Pryme 2.0 — Pryme X AI</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Inter+Tight:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js">
+// ── Stripe payment verification on page load ────────────────────────────
+(async()=>{
+  const params=new URLSearchParams(window.location.search);
+  const sessionId=params.get('session_id');
+  const planParam=params.get('plan');
+  if(sessionId&&planParam){
+    try{
+      const r=await fetch('/api/stripe/verify/'+sessionId);
+      const d=await r.json();
+      if(d.valid&&d.plan){
+        plan=d.plan;ls('plan',plan);setPlanUI();
+        toast('🎊 Upgraded to '+planLabel(plan)+'!',5000);
+        // Clean URL
+        window.history.replaceState({},'',window.location.pathname);
+      }
+    }catch(e){console.warn('[Pryme] Stripe verify error:',e);}
+  }
+  if(params.get('checkout')==='cancelled'){
+    toast('Payment cancelled — no charge made');
+    window.history.replaceState({},'',window.location.pathname);
+  }
+})();
+
+</script>
 <style>
 /* ═══ RESET ═══════════════════════════════════════════════════════════ */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -306,6 +330,54 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
 /* ═══ TOAST ═══════════════════════════════════════════════════════════ */
 #toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--card2);color:var(--txt);padding:10px 24px;border-radius:48px;font-size:13.5px;z-index:2000;transition:transform .3s cubic-bezier(.4,0,.2,1);pointer-events:none;white-space:nowrap;box-shadow:var(--sh2)}
 #toast.show{transform:translateX(-50%) translateY(0)}
+
+/* ═══════════════════════════════════════════════════════════════
+   MOBILE RESPONSIVENESS
+═══════════════════════════════════════════════════════════════ */
+.sb.closed{width:0!important;min-width:0!important;overflow:hidden}
+.sb.closed .sb-head,.sb.closed .sb-nav,.sb.closed .hist-list,.sb.closed .sb-foot{opacity:0;pointer-events:none}
+
+@media(max-width:768px){
+  :root{--sbw:260px}
+  .sb{position:fixed;top:0;left:0;z-index:200;height:100vh;transform:translateX(-100%);transition:transform .28s cubic-bezier(.4,0,.2,1);box-shadow:4px 0 24px rgba(0,0,0,.35)}
+  .sb.open{transform:translateX(0)}
+  .sb-overlay{display:none;position:fixed;inset:0;z-index:199;background:rgba(0,0,0,.55);backdrop-filter:blur(2px)}
+  .sb.open~.sb-overlay{display:block}
+  #main{width:100vw}
+  .cgrid{grid-template-columns:1fr 1fr!important;gap:10px!important}
+  .wh{font-size:clamp(1.4rem,5vw,2.2rem)!important}
+  .ws{font-size:.85rem!important}
+  .msgs{padding:16px 12px 16px!important}
+  .topbar{padding:8px 12px!important}
+  .modal{margin:12px!important;max-width:calc(100vw - 24px)!important}
+}
+@media(max-width:480px){
+  :root{--sbw:82vw}
+  .cgrid{grid-template-columns:1fr!important;gap:8px!important}
+  .wh{font-size:1.35rem!important}
+  .ws{font-size:.8rem!important}
+  .ccard{padding:14px 12px!important}
+  .ce{font-size:22px!important}
+  .ct{font-size:.82rem!important}
+  .cd{font-size:.73rem!important}
+  .chips{gap:6px!important}
+  .chip{font-size:.75rem!important;padding:7px 11px!important}
+  .ta-wrap{padding:8px 10px!important}
+  #ta{font-size:.88rem!important}
+  .sbtn{width:34px!important;height:34px!important}
+  .ai-av{width:28px!important;height:28px!important;font-size:11px!important}
+  .topbar{padding:6px 10px!important}
+  .modal{max-width:96vw!important;border-radius:18px!important}
+}
+@media(max-height:500px) and (orientation:landscape){
+  #welcome{padding:20px!important}
+  .wh{font-size:1.2rem!important}
+  .cgrid{grid-template-columns:repeat(3,1fr)!important}
+}
+@supports(padding:env(safe-area-inset-bottom)){
+  .ta-wrap{padding-bottom:calc(12px + env(safe-area-inset-bottom))!important}
+}
+
 </style>
 </head>
 <body>
@@ -1134,7 +1206,24 @@ async function loadSess(id){SID=id;$('chat').innerHTML='';renderHist();try{const
 function newChat(){SID=mkSID();imgs=[];$('chat').innerHTML='';$('img-prev').innerHTML='';$('ta').value='';$('ta').style.height='auto';setSend(false);renderHist();showWelcome();}
 
 // ── Sidebar toggle ─────────────────────────────────────────────────────
-function toggleSB(){$('sb').classList.toggle('closed');}
+function toggleSB(){
+  const sb=$('sb');
+  if(window.innerWidth<=768){
+    sb.classList.toggle('open');
+    let ov=document.querySelector('.sb-overlay');
+    if(!ov){ov=document.createElement('div');ov.className='sb-overlay';ov.onclick=()=>toggleSB();document.body.appendChild(ov);}
+    ov.style.display=sb.classList.contains('open')?'block':'none';
+  } else {
+    sb.classList.toggle('closed');
+  }
+}
+window.addEventListener('resize',()=>{
+  if(window.innerWidth>768){
+    const sb=$('sb');const ov=document.querySelector('.sb-overlay');
+    if(sb.classList.contains('open'))sb.classList.remove('open');
+    if(ov)ov.style.display='none';
+  }
+});
 
 // ── Google Login  —  FIXED: no raw 401 errors ──────────────────────────
 function startLogin() {
@@ -1194,7 +1283,15 @@ function doSandboxLogin() {
   };
   document.getElementById('g-modal')?.remove();
   user = u; ls('pu', JSON.stringify(u)); applyUser(u);
-  sendSignupEmails(u);
+  // Send welcome + notification emails via backend (replaces client-side EmailJS)
+  fetch('/api/email/signup',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({name:u.name,email:u.email})
+  }).then(r=>r.json()).then(d=>{
+    if(d.welcomeEmail?.success) console.log('[Pryme] Welcome email sent to',u.email);
+    if(d.notificationEmail?.success) console.log('[Pryme] Notification sent to Prymexai@gmail.com');
+  }).catch(e=>console.warn('[Pryme] Email API error:',e.message));
   toast('✅ Signed in as ' + u.name, 3500);
   closeM('set-ov');
 }
@@ -1285,7 +1382,22 @@ async function applyPromo(){
     msgEl.textContent='❌ Verification error — try again';
   }
 }
-function doPay(p,amt){$('pay-sec').style.display='block';$('pay-ttl').textContent=p==='pro'?'Pro Plan — $20/month':'Platinum Plan — $100/month';$('pay-lnk').href='https://www.paypal.com/paypalme/prymexai/'+amt;$('pay-lnk').textContent='💳 Pay $'+amt+' — '+(p==='pro'?'Pro':'Platinum');}
+async function doPay(p,amt){
+  // Try Stripe first (if backend configured), fall back to PayPal
+  try{
+    const r=await fetch('/api/stripe/checkout',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({plan:p,email:user?.email||''})
+    });
+    const d=await r.json();
+    if(d.url){window.location.href=d.url;return;} // redirect to Stripe checkout
+  }catch(e){console.warn('[Pryme] Stripe not available, falling back to PayPal');}
+  // PayPal fallback
+  $('pay-sec').style.display='block';
+  $('pay-ttl').textContent=p==='pro'?'Pro Plan — $20/month':'Platinum Plan — $100/month';
+  $('pay-lnk').href='https://www.paypal.com/paypalme/prymexai/'+amt;
+  $('pay-lnk').textContent='💳 Pay $'+amt+' — '+(p==='pro'?'Pro':'Platinum');
+}
 
 // ── Rate limit ─────────────────────────────────────────────────────────
 function startRL(s){
