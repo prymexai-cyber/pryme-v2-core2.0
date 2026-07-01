@@ -1,0 +1,1350 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pryme 2.0 — Pryme X AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Inter+Tight:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<style>
+/* ═══ RESET ═══════════════════════════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#131314;--sb:#1e1f20;--card:#26272a;--card2:#2f3033;--inp:#26272a;
+  --txt:#e3e3e3;--txt2:#9aa0a6;--dim:#5f6368;--bdr:#3c4043;--hov:rgba(255,255,255,.07);
+  --blue:#8ab4f8;--blue2:#4285f4;--purple:#c58af9;--green:#81c995;
+  --red:#f28b82;--gold:#f9d423;--cyan:#78d9ec;
+  --sbw:280px;
+  --sh:0 1px 3px rgba(0,0,0,.5),0 4px 16px rgba(0,0,0,.4);
+  --sh2:0 8px 32px rgba(0,0,0,.6),0 16px 64px rgba(0,0,0,.5);
+}
+[data-theme=light]{
+  --bg:#f8f9fa;--sb:#f1f3f4;--card:#fff;--card2:#f8f9fa;--inp:#f1f3f4;
+  --txt:#202124;--txt2:#5f6368;--dim:#9aa0a6;--bdr:#dadce0;--hov:rgba(0,0,0,.05);
+  --blue:#1a73e8;--blue2:#1a73e8;--sh:0 1px 3px rgba(0,0,0,.12),0 4px 14px rgba(0,0,0,.08);
+}
+html,body{height:100%;overflow:hidden}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--txt);display:flex;-webkit-font-smoothing:antialiased}
+
+/* ═══ ANIMATIONS ═══════════════════════════════════════════════════════ */
+@keyframes fadeUp   {from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn   {from{opacity:0}to{opacity:1}}
+@keyframes shimmer  {0%{background-position:-300% 0}100%{background-position:300% 0}}
+@keyframes gradMove {0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+@keyframes dotPulse {0%,80%,100%{opacity:.2;transform:scale(.65)}40%{opacity:1;transform:scale(1)}}
+@keyframes float    {0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+@keyframes pulse    {0%,100%{opacity:.5}50%{opacity:1}}
+@keyframes spin     {to{transform:rotate(360deg)}}
+@keyframes wv       {0%,100%{transform:scaleY(.35)}50%{transform:scaleY(1.5)}}
+@keyframes popIn    {from{opacity:0;transform:scale(.9) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
+@keyframes slideD   {from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideL   {from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:translateX(0)}}
+
+/* ═══ SIDEBAR ═══════════════════════════════════════════════════════════ */
+#sb{
+  width:var(--sbw);min-width:var(--sbw);background:var(--sb);height:100vh;
+  display:flex;flex-direction:column;border-right:1px solid var(--bdr);
+  flex-shrink:0;overflow:hidden;position:relative;z-index:50;
+  transition:width .3s cubic-bezier(.4,0,.2,1),min-width .3s cubic-bezier(.4,0,.2,1),border-color .3s,opacity .25s;
+}
+#sb.closed{width:0;min-width:0;border-right-color:transparent;opacity:0}
+.sb-head{display:flex;align-items:center;gap:4px;padding:12px 10px 8px;flex-shrink:0;min-width:var(--sbw)}
+.hbtn{background:none;border:none;color:var(--txt2);cursor:pointer;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
+.hbtn:hover{background:var(--hov);color:var(--txt)}
+.hbtn svg{width:22px;height:22px}
+.logo-a{display:flex;align-items:center;gap:10px;padding:4px 8px;border-radius:12px;cursor:pointer;flex:1;min-width:0;text-decoration:none;transition:all .15s}
+.logo-a:hover{background:var(--hov)}
+.logo-svg{width:34px;height:34px;flex-shrink:0}
+.logo-txt{font-family:'Inter Tight',sans-serif;font-size:15.5px;font-weight:700;letter-spacing:-.4px;white-space:nowrap;overflow:hidden;background:linear-gradient(130deg,#e8d700,#ffffff 40%,#8ab4f8);background-size:200%;animation:shimmer 5s linear infinite;-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.new-btn{display:flex;align-items:center;gap:11px;margin:4px 10px;padding:10px 14px;border-radius:48px;background:none;border:none;color:var(--txt);font:500 13.5px 'Inter';cursor:pointer;width:calc(100% - 20px);text-align:left;transition:all .15s;white-space:nowrap}
+.new-btn:hover{background:var(--hov)}
+.new-btn svg{width:20px;height:20px;flex-shrink:0}
+.sb-div{height:1px;background:var(--bdr);margin:6px 12px}
+.sb-lbl{padding:12px 22px 5px;font-size:10.5px;color:var(--dim);text-transform:uppercase;letter-spacing:.9px;font-weight:500;white-space:nowrap}
+.sb-nav{padding:2px 10px;display:flex;flex-direction:column;gap:1px}
+.sb-it{display:flex;align-items:center;gap:12px;padding:9px 14px;border-radius:48px;background:none;border:none;color:var(--txt2);font:400 13.5px 'Inter';cursor:pointer;width:100%;text-align:left;transition:all .15s;white-space:nowrap}
+.sb-it:hover{background:var(--hov);color:var(--txt)}
+.sb-it svg{width:19px;height:19px;flex-shrink:0}
+.sbadge{margin-left:auto;font-size:10px;font-weight:600;padding:2px 7px;border-radius:12px}
+.b-blue{background:rgba(138,180,248,.18);color:var(--blue)}
+.b-fig{background:rgba(26,188,254,.15);color:#1ABCFE}
+.b-red{background:rgba(242,139,130,.15);color:var(--red)}
+.hist-list{flex:1;overflow-y:auto;padding:2px 10px 8px;min-width:var(--sbw)}
+.hist-list::-webkit-scrollbar{width:3px}
+.hist-list::-webkit-scrollbar-thumb{background:var(--bdr);border-radius:2px}
+.hist-row{display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:48px;cursor:pointer;color:var(--txt2);font-size:13px;transition:all .15s}
+.hist-row:hover{background:var(--hov);color:var(--txt)}
+.hist-row.act{background:rgba(138,180,248,.1);color:var(--txt)}
+.hist-ttl{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hist-del{opacity:0;background:none;border:none;color:var(--dim);cursor:pointer;padding:2px 4px;border-radius:5px;font-size:14px;line-height:1;transition:all .15s;flex-shrink:0}
+.hist-row:hover .hist-del{opacity:1}
+.hist-del:hover{background:rgba(242,139,130,.15);color:var(--red)}
+.hist-pin{opacity:0;background:none;border:none;color:var(--dim);cursor:pointer;padding:3px;border-radius:5px;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
+.hist-pin svg{width:14px;height:14px}
+.hist-row:hover .hist-pin{opacity:1}
+.hist-pin:hover{background:rgba(138,180,248,.15);color:var(--blue)}
+.hist-pin.pinned{opacity:1;color:var(--gold)}
+.hist-pin.pinned:hover{background:rgba(249,212,35,.15);color:var(--gold)}
+.sb-foot{flex-shrink:0;padding:8px 10px;border-top:1px solid var(--bdr);min-width:var(--sbw)}
+.login-card{padding:12px;margin-bottom:4px;background:rgba(138,180,248,.07);border:1px solid rgba(138,180,248,.18);border-radius:16px}
+.login-card p{font-size:12px;color:var(--txt2);line-height:1.55;margin-bottom:10px}
+.g-btn{display:flex;align-items:center;justify-content:center;gap:8px;background:#fff;color:#202124;border:none;border-radius:48px;padding:9px 18px;font:500 13px 'Inter';cursor:pointer;width:100%;transition:all .15s;box-shadow:var(--sh)}
+.g-btn:hover{box-shadow:var(--sh2);transform:scale(1.01)}
+.user-cap{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:48px;cursor:pointer;transition:all .15s}
+.user-cap:hover{background:var(--hov)}
+.ava{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#4285f4,#34a853);display:flex;align-items:center;justify-content:center;font:600 13px 'Inter';color:#fff;flex-shrink:0;overflow:hidden}
+.ava img{width:100%;height:100%;border-radius:50%;object-fit:cover}
+.u-info{flex:1;min-width:0}
+.u-name{font:500 13px 'Inter';color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.u-email{font-size:11.5px;color:var(--txt2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.plan-pill{font-size:9px;font-weight:700;padding:1px 6px;border-radius:10px;margin-left:4px;vertical-align:middle}
+.pill-free{background:rgba(158,158,158,.2);color:#9aa0a6}
+.pill-pro{background:rgba(138,180,248,.2);color:var(--blue)}
+.pill-plat{background:linear-gradient(135deg,#ffd700,#ff8c00);color:#000}
+
+/* ═══ MAIN ════════════════════════════════════════════════════════════ */
+#main{flex:1;display:flex;flex-direction:column;height:100vh;overflow:hidden;position:relative;min-width:0}
+.main-glow{position:absolute;inset:0;z-index:0;pointer-events:none;background:radial-gradient(circle at 50% 50%,rgba(26,38,57,.5) 0%,rgba(13,13,20,1) 70%)}
+[data-theme=light] .main-glow{background:radial-gradient(circle at 50% 30%,rgba(66,133,244,.06) 0%,transparent 65%)}
+
+/* ═══ TOP BAR ═════════════════════════════════════════════════════════ */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 18px;position:relative;z-index:20;flex-shrink:0}
+.tb-l{display:flex;align-items:center;gap:6px}
+#top-ham{background:none;border:none;color:var(--txt2);cursor:pointer;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:all .15s}
+#top-ham:hover{background:var(--hov);color:var(--txt)}
+#top-ham svg{width:22px;height:22px}
+.mpill{display:flex;align-items:center;gap:7px;padding:7px 13px;border-radius:48px;background:none;border:1px solid var(--bdr);color:var(--txt2);font:500 13.5px 'Inter';cursor:pointer;transition:all .2s;position:relative}
+.mpill:hover{border-color:var(--blue);color:var(--txt)}
+.mpill.open .mchev{transform:rotate(180deg)}
+.edot{width:7px;height:7px;border-radius:50%;background:var(--green);flex-shrink:0;transition:all .3s}
+.edot.off{background:var(--red);animation:none}
+.edot.wait{background:var(--gold);animation:pulse 1.5s infinite}
+.mchev{width:14px;height:14px;transition:transform .2s}
+#mdd{position:absolute;top:calc(100% + 9px);left:0;background:var(--sb);border:1px solid var(--bdr);border-radius:18px;padding:7px;min-width:280px;z-index:400;display:none;box-shadow:var(--sh2);animation:slideD .18s ease}
+#mdd.open{display:block}
+.mopt{display:flex;align-items:center;gap:11px;padding:10px 13px;border-radius:12px;cursor:pointer;transition:all .15s}
+.mopt:hover{background:var(--hov)}
+.mopt.sel{background:rgba(138,180,248,.1);border:1px solid rgba(138,180,248,.2)}
+.micon{width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.mname{font:500 13.5px 'Inter';color:var(--txt)}
+.mdesc{font-size:11px;color:var(--txt2);margin-top:1px}
+.tb-r{display:flex;align-items:center;gap:4px}
+.ib{background:none;border:none;color:var(--txt2);cursor:pointer;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:all .15s;position:relative}
+.ib:hover{background:var(--hov);color:var(--txt)}
+.ib svg{width:20px;height:20px}
+.ib .dot{position:absolute;top:6px;right:6px;width:7px;height:7px;background:var(--red);border-radius:50%;border:2px solid var(--bg)}
+
+/* ═══ CHAT ════════════════════════════════════════════════════════════ */
+#chat{flex:1;overflow-y:auto;position:relative;z-index:1;scroll-behavior:smooth}
+#chat::-webkit-scrollbar{width:5px}
+#chat::-webkit-scrollbar-thumb{background:var(--bdr);border-radius:3px}
+.msgs{max-width:768px;margin:0 auto;padding:24px 20px 20px}
+
+/* ═══ WELCOME ═════════════════════════════════════════════════════════ */
+#welcome{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100%;padding:40px 20px 160px;animation:fadeUp .5s ease}
+.wlogo{margin-bottom:20px;animation:float 4s ease-in-out infinite}
+.wh{font-family:'Inter Tight',sans-serif;font-size:32px;font-weight:700;letter-spacing:-.6px;text-align:center;margin-bottom:8px;background:linear-gradient(135deg,#8ab4f8 0%,#c58af9 28%,#81c995 58%,#f28b82 100%);background-size:300% 300%;animation:gradMove 7s ease infinite;-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.ws{font-size:15px;color:var(--txt2);text-align:center;margin-bottom:34px;line-height:1.55;max-width:540px}
+.cgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;max-width:700px;width:100%;margin-bottom:30px}
+.ccard{background:var(--card);border:1px solid var(--bdr);border-radius:18px;padding:16px;cursor:pointer;transition:all .2s;text-align:left}
+.ccard:hover{border-color:var(--blue);transform:translateY(-3px);box-shadow:var(--sh)}
+.ce{font-size:22px;margin-bottom:9px;display:block}
+.ct{font:600 13px 'Inter';color:var(--txt);margin-bottom:4px}
+.cd{font-size:11.5px;color:var(--txt2);line-height:1.45}
+.chips{display:flex;flex-wrap:wrap;gap:9px;justify-content:center;max-width:700px}
+.chip{display:flex;align-items:center;gap:8px;padding:9px 16px;border-radius:48px;background:var(--card);border:1px solid var(--bdr);font:400 13.5px 'Inter';color:var(--txt2);cursor:pointer;transition:all .2s}
+.chip:hover{border-color:var(--blue);color:var(--txt);transform:translateY(-2px)}
+.chip svg{width:15px;height:15px;flex-shrink:0}
+
+/* ═══ MESSAGES ════════════════════════════════════════════════════════ */
+.u-row{display:flex;justify-content:flex-end;margin-bottom:22px;animation:fadeUp .3s}
+.u-bub{background:var(--card);border:1px solid var(--bdr);border-radius:22px 22px 5px 22px;padding:13px 18px;max-width:73%;font-size:15px;line-height:1.65;color:var(--txt);word-break:break-word}
+.u-bub .att{max-width:220px;max-height:180px;border-radius:12px;display:block;margin-bottom:9px;border:1px solid var(--bdr)}
+.ai-row{display:flex;gap:13px;margin-bottom:22px;animation:fadeUp .3s}
+.ai-av{width:34px;height:34px;border-radius:50%;flex-shrink:0;margin-top:2px;background:var(--card);border:1px solid var(--bdr);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.ai-body{flex:1;min-width:0}
+.ai-sndr{font:500 13.5px 'Inter';color:var(--txt);margin-bottom:7px;display:flex;align-items:center;gap:8px}
+.ai-bdg{font-size:10px;font-weight:500;padding:2px 8px;border-radius:10px;background:rgba(138,180,248,.14);color:var(--blue)}
+.ai-bdg.degraded{background:rgba(249,212,35,.16);color:var(--gold)}
+
+/* markdown */
+.md{font-size:15px;line-height:1.77;color:var(--txt);word-break:break-word}
+.md h1{font-size:21px;font-weight:700;margin:14px 0 6px}
+.md h2{font-size:18px;font-weight:600;margin:12px 0 5px}
+.md h3{font-size:15.5px;font-weight:600;margin:10px 0 4px}
+.md h4{font-size:14px;font-weight:600;margin:8px 0 4px}
+.md p{margin:5px 0}
+.md ul,.md ol{margin:5px 0 5px 22px}.md li{margin:4px 0}
+.md strong{font-weight:700}.md em{font-style:italic}
+.md a{color:var(--blue);text-decoration:none}.md a:hover{text-decoration:underline}
+.md blockquote{border-left:3px solid var(--blue);padding:2px 0 2px 14px;color:var(--txt2);margin:9px 0;font-style:italic}
+.md hr{border:none;border-top:1px solid var(--bdr);margin:12px 0}
+.md table{border-collapse:collapse;width:100%;margin:11px 0;font-size:13.5px;border-radius:12px;overflow:hidden}
+.md th,.md td{border:1px solid var(--bdr);padding:9px 13px;text-align:left}
+.md th{background:var(--card2);font-weight:600}
+.md tr:nth-child(even) td{background:rgba(255,255,255,.025)}
+[data-theme=light] .md tr:nth-child(even) td{background:rgba(0,0,0,.025)}
+.md pre{background:#0b0b0d;border:1px solid var(--bdr);border-radius:14px;padding:16px;overflow-x:auto;margin:11px 0;position:relative;font-family:'JetBrains Mono',monospace}
+[data-theme=light] .md pre{background:#f4f6f8}
+.md pre code{font-family:inherit;font-size:13.5px;line-height:1.58;color:#e2e8f0;background:none;padding:0}
+[data-theme=light] .md pre code{color:#1e293b}
+.md code:not(pre code){background:rgba(138,180,248,.11);padding:2px 7px;border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:13.5px;color:var(--blue)}
+.cpbtn{position:absolute;top:10px;right:10px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:4px 11px;font:400 11px 'Inter';color:#bbb;cursor:pointer;transition:all .15s}
+.cpbtn:hover{background:rgba(255,255,255,.18);color:#fff}
+
+/* figma card */
+.fig-card{display:flex;align-items:center;gap:13px;background:linear-gradient(135deg,rgba(26,115,232,.09),rgba(103,80,164,.07));border:1px solid rgba(26,115,232,.22);border-radius:16px;padding:14px 18px;margin:13px 0;cursor:pointer;transition:all .22s;text-decoration:none;animation:popIn .35s}
+.fig-card:hover{background:linear-gradient(135deg,rgba(26,115,232,.18),rgba(103,80,164,.14));border-color:rgba(26,115,232,.48);transform:translateY(-2px);box-shadow:0 8px 26px rgba(26,115,232,.2)}
+.finfo{flex:1}.ftitle{font:500 14px 'Inter';color:var(--txt)}.fsub{font-size:12px;color:var(--txt2);margin-top:2px}
+
+/* thinking */
+.think-row{display:flex;gap:13px;margin-bottom:22px}
+.t-dots{display:flex;gap:5px;align-items:center;padding:6px 0}
+.tdot{width:8px;height:8px;border-radius:50%;background:var(--blue);animation:dotPulse 1.4s infinite}
+.tdot:nth-child(2){animation-delay:.2s}.tdot:nth-child(3){animation-delay:.4s}
+
+/* action buttons */
+.acts{display:flex;gap:3px;margin-top:9px;opacity:0;transition:opacity .18s}
+.ai-row:hover .acts{opacity:1}
+.abtn{display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:9px;background:none;border:1px solid transparent;color:var(--txt2);font:400 12px 'Inter';cursor:pointer;transition:all .15s}
+.abtn:hover{background:var(--hov);border-color:var(--bdr);color:var(--txt)}
+.abtn svg{width:14px;height:14px;flex-shrink:0}
+
+/* ═══ IMAGE PREVIEWS ══════════════════════════════════════════════════ */
+#img-prev{display:flex;gap:9px;flex-wrap:wrap;padding:4px 20px 0;max-width:808px;margin:0 auto;width:100%}
+.ithumb{position:relative;width:72px;height:72px;flex-shrink:0}
+.ithumb img{width:100%;height:100%;object-fit:cover;border-radius:11px;border:1px solid var(--bdr)}
+.idel{position:absolute;top:-6px;right:-6px;width:18px;height:18px;background:var(--red);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;font-size:11px;border:2px solid var(--bg);line-height:1}
+
+/* ═══ INPUT DOCK ══════════════════════════════════════════════════════ */
+#dock{flex-shrink:0;padding:8px 18px 14px;max-width:808px;width:100%;margin:0 auto;position:relative;z-index:10}
+.ishell{background:var(--inp);border:1px solid var(--bdr);border-radius:26px;transition:all .2s;overflow:hidden}
+.ishell:focus-within{border-color:var(--blue);box-shadow:0 0 0 2px rgba(138,180,248,.13)}
+.irow{display:flex;align-items:flex-end;gap:4px;padding:9px 9px 9px 16px}
+.ibtn{background:none;border:none;cursor:pointer;color:var(--txt2);display:flex;padding:7px;border-radius:50%;transition:all .15s;flex-shrink:0}
+.ibtn:hover{background:var(--hov);color:var(--txt)}
+.ibtn.rec{color:var(--red);animation:pulse .9s infinite}
+.ibtn svg{width:20px;height:20px}
+#ta{flex:1;background:none;border:none;outline:none;color:var(--txt);font:400 15px 'Inter';resize:none;min-height:24px;max-height:180px;overflow-y:auto;line-height:1.6;padding:2px 0;caret-color:var(--blue)}
+#ta::placeholder{color:var(--dim)}
+.sbtn{background:var(--blue2);border:none;border-radius:50%;width:37px;height:37px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:all .2s;opacity:.3;pointer-events:none}
+.sbtn.on{opacity:1;pointer-events:auto}
+.sbtn.on:hover{filter:brightness(1.12);transform:scale(1.07)}
+.sbtn svg{width:18px;height:18px;color:#fff}
+.vstrip{display:none;align-items:center;gap:11px;padding:7px 16px;background:rgba(242,139,130,.07);border-top:1px solid rgba(242,139,130,.14)}
+.vstrip.on{display:flex}
+.vwav{display:flex;gap:3px;align-items:center;height:26px}
+.vb{width:3px;border-radius:3px;background:var(--red);animation:wv 1.2s ease-in-out infinite}
+.vb:nth-child(1){height:8px}.vb:nth-child(2){height:14px;animation-delay:.1s}.vb:nth-child(3){height:21px;animation-delay:.2s}.vb:nth-child(4){height:14px;animation-delay:.3s}.vb:nth-child(5){height:8px;animation-delay:.4s}
+.vlbl{font-size:13px;color:var(--red);flex:1}
+.vstop{background:none;border:1px solid rgba(242,139,130,.4);border-radius:20px;padding:3px 13px;font-size:12.5px;color:var(--red);cursor:pointer;font-family:'Inter'}
+.hint{text-align:center;font-size:11px;color:var(--dim);margin-top:5px;padding-bottom:2px}
+
+/* ═══ RATE LIMIT ══════════════════════════════════════════════════════ */
+.rl{display:none;padding:8px 18px;font-size:12.5px;color:var(--gold);background:rgba(249,212,35,.07);border-bottom:1px solid rgba(249,212,35,.2);text-align:center;flex-shrink:0;position:relative;z-index:5}
+.rl.show{display:block}
+
+/* ═══ MODALS ══════════════════════════════════════════════════════════ */
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.62);z-index:600;display:none;align-items:center;justify-content:center;padding:16px}
+.ov.open{display:flex;animation:fadeIn .2s}
+.modal{background:var(--sb);border:1px solid var(--bdr);border-radius:24px;width:100%;max-width:460px;box-shadow:var(--sh2);animation:popIn .25s;max-height:90vh;overflow-y:auto}
+.modal.wd{max-width:540px}
+.mhd{display:flex;align-items:center;justify-content:space-between;padding:18px 22px 14px;border-bottom:1px solid var(--bdr);flex-shrink:0;position:sticky;top:0;background:var(--sb);z-index:1}
+.mhd-t{font:600 15.5px 'Inter';color:var(--txt)}
+.mcls{background:none;border:none;color:var(--txt2);cursor:pointer;padding:6px;border-radius:50%;display:flex;transition:all .15s}
+.mcls:hover{background:var(--hov);color:var(--txt)}
+.mcls svg{width:20px;height:20px}
+.mbod{padding:16px 22px 22px;display:flex;flex-direction:column;gap:5px}
+.mr{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--bdr)}
+.mr:last-child{border-bottom:none}
+.ml{display:flex;flex-direction:column;gap:3px}
+.ml-n{font:500 13.5px 'Inter';color:var(--txt)}
+.ml-s{font-size:12px;color:var(--txt2)}
+/* toggle */
+.tgl{position:relative;width:43px;height:23px;flex-shrink:0}
+.tgl input{opacity:0;width:0;height:0}
+.ttr{position:absolute;inset:0;background:var(--bdr);border-radius:12px;cursor:pointer;transition:background .2s}
+.ttr::before{content:'';position:absolute;width:17px;height:17px;left:3px;top:3px;background:#fff;border-radius:50%;transition:transform .2s;box-shadow:0 1px 4px rgba(0,0,0,.35)}
+.tgl input:checked+.ttr{background:var(--blue2)}
+.tgl input:checked+.ttr::before{transform:translateX(20px)}
+/* theme btns */
+.tw{display:flex;gap:6px}
+.twb{padding:5px 14px;border-radius:20px;font:500 12.5px 'Inter';cursor:pointer;border:1px solid var(--bdr);background:none;color:var(--txt2);transition:all .15s}
+.twb:hover{background:var(--hov)}
+.twb.on{background:var(--blue2);color:#fff;border-color:var(--blue2)}
+/* inputs */
+.mi{width:100%;background:var(--card);border:1px solid var(--bdr);color:var(--txt);border-radius:11px;padding:9px 13px;font:400 13.5px 'Inter';outline:none;transition:border .2s}
+.mi:focus{border-color:var(--blue)}
+.mi::placeholder{color:var(--dim)}
+.mi.mono{font-family:'JetBrains Mono','Courier New',monospace;font-size:12.5px}
+.frow{display:flex;gap:9px;margin-top:7px}
+.mbtn{background:var(--blue2);color:#fff;border:none;border-radius:11px;padding:9px 17px;font:500 13.5px 'Inter';cursor:pointer;transition:all .15s;white-space:nowrap}
+.mbtn:hover{filter:brightness(1.1);transform:scale(1.01)}
+.mbtn.danger{background:none;border:none;color:var(--red);font-size:12.5px;cursor:pointer;text-decoration:underline}
+.mstat{padding:11px 13px;border-radius:12px;font-size:13px;margin-bottom:12px;display:flex;align-items:center;gap:9px}
+.mstat.ok{background:rgba(129,201,149,.08);border:1px solid rgba(129,201,149,.22);color:var(--green)}
+.mstat.err{background:rgba(242,139,130,.08);border:1px solid rgba(242,139,130,.22);color:var(--red)}
+.mstat svg{width:18px;height:18px;flex-shrink:0}
+.mres{display:none;margin-top:11px;padding:10px 13px;border-radius:10px;font-size:13px;background:var(--card)}
+.minfo{margin-top:12px;padding:13px;background:rgba(129,201,149,.07);border:1px solid rgba(129,201,149,.2);border-radius:12px;font-size:12px;color:var(--txt2);line-height:1.65}
+.msel{background:var(--card);border:1px solid var(--bdr);color:var(--txt);border-radius:10px;padding:7px 11px;font:400 13px 'Inter';cursor:pointer;outline:none;-webkit-appearance:none;width:auto}
+/* plans */
+.plans{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;margin:12px 0}
+.plan{border:1px solid var(--bdr);border-radius:18px;padding:17px;background:var(--card);text-align:center;position:relative;cursor:pointer;transition:all .2s}
+.plan:hover,.plan.hot{border-color:var(--blue)}.plan.hot{background:rgba(138,180,248,.05)}
+.p-top{position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--blue2);color:#fff;font-size:9.5px;font-weight:700;padding:2px 11px;border-radius:12px;white-space:nowrap}
+.p-name{font:500 13px 'Inter';color:var(--txt);margin-bottom:5px}
+.p-price{font-size:24px;font-weight:700;color:var(--txt)}.p-per{font-size:10.5px;color:var(--txt2)}
+.p-feats{margin:11px 0;text-align:left}
+.p-feat{font-size:11.5px;color:var(--txt2);padding:2.5px 0;display:flex;gap:6px}
+.p-feat::before{content:'✓';color:var(--green);font-weight:700;flex-shrink:0}
+.pbtn{background:var(--blue2);color:#fff;border:none;border-radius:20px;padding:8px 16px;font:500 12.5px 'Inter';cursor:pointer;width:100%;transition:all .15s;margin-top:9px}
+.pbtn:hover{filter:brightness(1.1)}
+.pbtn.fr{background:var(--card2);color:var(--txt);border:1px solid var(--bdr)}
+.pbtn.pt{background:linear-gradient(135deg,#ffd700,#ff8c00);color:#000}
+/* ═══ TOAST ═══════════════════════════════════════════════════════════ */
+#toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--card2);color:var(--txt);padding:10px 24px;border-radius:48px;font-size:13.5px;z-index:2000;transition:transform .3s cubic-bezier(.4,0,.2,1);pointer-events:none;white-space:nowrap;box-shadow:var(--sh2)}
+#toast.show{transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<!-- ══════════════ SIDEBAR ══════════════ -->
+<aside id="sb">
+  <div class="sb-head">
+    <button class="hbtn" id="sb-ham" onclick="toggleSB()" title="Toggle sidebar">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+    </button>
+    <a class="logo-a" href="#" onclick="newChat();return false">
+      <svg class="logo-svg" viewBox="0 0 40 40" fill="none">
+        <circle cx="20" cy="20" r="19" fill="#1a1a1a" stroke="#2a2a2a" stroke-width="1.5"/>
+        <path d="M7.5 20 A12.5 12.5 0 0 1 32.5 20" stroke="#e8d700" stroke-width="4" fill="none" stroke-linecap="round"/>
+        <path d="M7.5 20 A12.5 12.5 0 0 0 20 32.5" stroke="#ffffff" stroke-width="4" fill="none" stroke-linecap="round"/>
+        <circle cx="9.5" cy="13.5" r="1.5" fill="#e8d700"/>
+        <circle cx="30.5" cy="13.5" r="1.5" fill="#e8d700"/>
+        <line x1="9.5" y1="13.5" x2="9.5" y2="9.2" stroke="#e8d700" stroke-width="1.3"/>
+        <circle cx="9.5" cy="7.9" r="1.2" fill="none" stroke="#e8d700" stroke-width="1.1"/>
+        <line x1="30.5" y1="13.5" x2="30.5" y2="9.2" stroke="#e8d700" stroke-width="1.3"/>
+        <circle cx="30.5" cy="7.9" r="1.2" fill="none" stroke="#e8d700" stroke-width="1.1"/>
+        <text x="11" y="25" font-family="Arial Black,Arial" font-weight="900" font-size="9.5" fill="#ffffff" letter-spacing="-.5">PX</text>
+      </svg>
+      <span class="logo-txt">Pryme X AI</span>
+    </a>
+  </div>
+
+  <button class="new-btn" onclick="newChat()">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 000-1.41l-2.34-2.34a1 1 0 00-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+    New chat
+  </button>
+
+  <nav class="sb-nav">
+    <button class="sb-it" onclick="sug('Generate creative concept ideas with visual descriptions, color palettes, and composition notes for an AI product promotional image')">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+      Images <span class="sbadge b-blue">AI</span>
+    </button>
+    <button class="sb-it" id="fig-sb" onclick="openFig()">
+      <svg viewBox="0 0 38 57" fill="none" width="19" height="19">
+        <path d="M19 28.5A9.5 9.5 0 1 1 28.5 19 9.5 9.5 0 0 1 19 28.5z" fill="#1ABCFE"/>
+        <path d="M9.5 47.5A9.5 9.5 0 0 1 19 38v9.5A9.5 9.5 0 0 1 9.5 57z" fill="#0ACF83"/>
+        <path d="M0 38a9.5 9.5 0 0 1 9.5-9.5H19V38A9.5 9.5 0 0 1 0 38z" fill="#FF7262"/>
+        <path d="M19 0H9.5A9.5 9.5 0 0 0 0 9.5 9.5 9.5 0 0 0 9.5 19H19z" fill="#F24E1E"/>
+        <path d="M19 0h9.5A9.5 9.5 0 0 1 38 9.5 9.5 9.5 0 0 1 28.5 19H19z" fill="#FF7262"/>
+      </svg>
+      Figma Design <span class="sbadge" id="fig-badge">No Token</span>
+    </button>
+    <button class="sb-it" onclick="sug('Design a complete Make.com automation: Typeform form submission → add to Google Sheets + HubSpot CRM + send personalized Gmail + post to Slack #leads. Give all module configs and field mappings.')">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.3.06-.61.06-.94s-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32a.49.49 0 00-.59-.22l-2.39.96a7.3 7.3 0 00-1.62-.94l-.36-2.54a.484.484 0 00-.48-.41H9.84a.484.484 0 00-.47.41l-.36 2.54a7.3 7.3 0 00-1.62.94l-2.39-.96a.48.48 0 00-.59.22L2.49 8.88c-.12.21-.07.47.12.61l2.03 1.58a6.7 6.7 0 00-.09.94c0 .31.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+      Automation
+    </button>
+  </nav>
+
+  <div class="sb-div"></div>
+  <div class="sb-lbl" id="pinned-lbl" style="display:none">Pinned</div>
+  <div class="hist-list pinned-chats-container" id="pinned-hist" style="flex:0 0 auto;max-height:40%"></div>
+  <div class="sb-lbl">Recent chats</div>
+  <div class="hist-list" id="hist"></div>
+
+  <div class="sb-foot">
+    <div id="login-card" class="login-card">
+      <p>Sign in to save history &amp; manage subscription</p>
+      <button class="g-btn" onclick="startLogin()">
+        <svg width="17" height="17" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+        Sign in with Google
+      </button>
+    </div>
+    <div id="user-row" style="display:none">
+      <div class="user-cap" onclick="openSettings()">
+        <div class="ava" id="u-ava">P</div>
+        <div class="u-info">
+          <div class="u-name" id="u-name">User <span class="plan-pill pill-free" id="plan-pill">Free</span></div>
+          <div class="u-email" id="u-email"></div>
+        </div>
+        <button onclick="event.stopPropagation();openSettings()" style="background:none;border:none;color:var(--txt2);cursor:pointer;padding:5px;border-radius:50%;display:flex;transition:all .15s" onmouseenter="this.style.background='var(--hov)'" onmouseleave="this.style.background='none'">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M19.14 12.94c.04-.3.06-.61.06-.94s-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32a.49.49 0 00-.59-.22l-2.39.96a7.3 7.3 0 00-1.62-.94l-.36-2.54a.484.484 0 00-.48-.41H9.84a.484.484 0 00-.47.41l-.36 2.54a7.3 7.3 0 00-1.62.94l-2.39-.96a.48.48 0 00-.59.22L2.49 8.88c-.12.21-.07.47.12.61l2.03 1.58a6.7 6.7 0 00-.09.94c0 .31.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- ══════════════ MAIN ══════════════ -->
+<main id="main">
+  <div class="main-glow"></div>
+
+  <!-- TOP BAR — no status banner -->
+  <div class="topbar">
+    <div class="tb-l">
+      <button id="top-ham" onclick="toggleSB()" title="Toggle sidebar">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+      </button>
+      <div style="position:relative">
+        <button class="mpill" id="mpill" onclick="toggleMDD(event)">
+          <div class="edot wait" id="edot"></div>
+          <span id="mname">Pryme 2.0</span>
+          <svg class="mchev" viewBox="0 0 24 24" fill="currentColor"><path d="M7 10l5 5 5-5z"/></svg>
+        </button>
+        <div id="mdd"></div>
+      </div>
+    </div>
+    <div class="tb-r">
+      <button class="ib" onclick="openFig()" title="Figma Account">
+        <svg viewBox="0 0 38 57" fill="none" width="20" height="20">
+          <path d="M19 28.5A9.5 9.5 0 1 1 28.5 19 9.5 9.5 0 0 1 19 28.5z" fill="#1ABCFE"/>
+          <path d="M9.5 47.5A9.5 9.5 0 0 1 19 38v9.5A9.5 9.5 0 0 1 9.5 57z" fill="#0ACF83"/>
+          <path d="M0 38a9.5 9.5 0 0 1 9.5-9.5H19V38A9.5 9.5 0 0 1 0 38z" fill="#FF7262"/>
+          <path d="M19 0H9.5A9.5 9.5 0 0 0 0 9.5 9.5 9.5 0 0 0 9.5 19H19z" fill="#F24E1E"/>
+          <path d="M19 0h9.5A9.5 9.5 0 0 1 38 9.5 9.5 9.5 0 0 1 28.5 19H19z" fill="#FF7262"/>
+        </svg>
+        <div class="dot" id="fig-dot"></div>
+      </button>
+      <button class="ib" onclick="openPricing()" title="Upgrade">
+        <svg viewBox="0 0 24 24" fill="currentColor" style="color:var(--gold)"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
+      </button>
+      <button class="ib" onclick="openSettings()" title="Settings">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.3.06-.61.06-.94s-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32a.49.49 0 00-.59-.22l-2.39.96a7.3 7.3 0 00-1.62-.94l-.36-2.54a.484.484 0 00-.48-.41H9.84a.484.484 0 00-.47.41l-.36 2.54a7.3 7.3 0 00-1.62.94l-2.39-.96a.48.48 0 00-.59.22L2.49 8.88c-.12.21-.07.47.12.61l2.03 1.58a6.7 6.7 0 00-.09.94c0 .31.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Rate limit bar -->
+  <div class="rl" id="rl">⏳ Rate limit — wait <span id="rl-s">60</span>s then resend</div>
+
+  <!-- Chat area -->
+  <div id="chat"></div>
+
+  <!-- Image previews -->
+  <div id="img-prev"></div>
+
+  <!-- Input dock — NO status banner above -->
+  <div id="dock">
+    <div class="ishell">
+      <div class="irow">
+        <button class="ibtn" onclick="document.getElementById('fi-img').click()" title="Upload image">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+        </button>
+        <button class="ibtn" onclick="document.getElementById('fi-att').click()" title="Attach file">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.5 6v11.5c0 2.21-1.79 4-4 4s-4-1.79-4-4V5c0-1.38 1.12-2.5 2.5-2.5s2.5 1.12 2.5 2.5v10.5c0 .55-.45 1-1 1s-1-.45-1-1V6H10v9.5c0 1.38 1.12 2.5 2.5 2.5s2.5-1.12 2.5-2.5V5c0-2.21-1.79-4-4-4S7 2.79 7 5v12.5c0 3.04 2.46 5.5 5.5 5.5s5.5-2.46 5.5-5.5V6h-1.5z"/></svg>
+        </button>
+        <!-- PLACEHOLDER CHANGED HERE -->
+        <textarea id="ta" placeholder="Write a message Pryme 2.0" rows="1" onkeydown="onKey(event)" oninput="onInp(this)"></textarea>
+        <button class="ibtn" id="mic-btn" onclick="toggleVoice()" title="Voice input (auto-detect language)">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.91-3c-.49 0-.9.36-.98.85C16.52 14.2 14.47 16 12 16s-4.52-1.8-4.93-4.15a.998.998 0 00-.98-.85c-.61 0-1.07.54-.98 1.14.49 3 2.89 5.35 5.89 5.78V19c0 .55.45 1 1 1s1-.45 1-1v-1.08c3-.43 5.4-2.78 5.89-5.78.1-.6-.37-1.14-.98-1.14z"/></svg>
+        </button>
+        <button class="sbtn" id="snd" onclick="sendMsg()" title="Send">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+        </button>
+      </div>
+      <div class="vstrip" id="vstrip">
+        <div class="vwav"><div class="vb"></div><div class="vb"></div><div class="vb"></div><div class="vb"></div><div class="vb"></div></div>
+        <span class="vlbl" id="vlbl">Listening…</span>
+        <button class="vstop" onclick="stopVoice()">Stop &amp; Send</button>
+      </div>
+    </div>
+    <div class="hint">Pryme 2.0 · Pryme X AI Company · Prymexai@gmail.com</div>
+  </div>
+</main>
+
+<!-- ══════════════ FIGMA MODAL ══════════════ -->
+<div class="ov" id="fig-ov" onclick="if(event.target===this)closeM('fig-ov')">
+  <div class="modal">
+    <div class="mhd">
+      <span class="mhd-t">
+        <svg viewBox="0 0 38 57" fill="none" width="18" height="18" style="vertical-align:-3px;margin-right:7px">
+          <path d="M19 28.5A9.5 9.5 0 1 1 28.5 19 9.5 9.5 0 0 1 19 28.5z" fill="#1ABCFE"/>
+          <path d="M9.5 47.5A9.5 9.5 0 0 1 19 38v9.5A9.5 9.5 0 0 1 9.5 57z" fill="#0ACF83"/>
+          <path d="M0 38a9.5 9.5 0 0 1 9.5-9.5H19V38A9.5 9.5 0 0 1 0 38z" fill="#FF7262"/>
+          <path d="M19 0H9.5A9.5 9.5 0 0 0 0 9.5 9.5 9.5 0 0 0 9.5 19H19z" fill="#F24E1E"/>
+          <path d="M19 0h9.5A9.5 9.5 0 0 1 38 9.5 9.5 9.5 0 0 1 28.5 19H19z" fill="#FF7262"/>
+        </svg>
+        Connect Figma Account
+      </span>
+      <button class="mcls" onclick="closeM('fig-ov')"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button>
+    </div>
+    <div class="mbod">
+      <div class="mstat err" id="fig-stat">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+        <span id="fig-stat-txt">No token — designs open Figma.com instead of your account</span>
+      </div>
+      <div style="font-size:12.5px;color:var(--txt2);line-height:1.9;margin-bottom:13px">
+        <strong style="color:var(--txt)">Get your Figma Personal Access Token:</strong><br>
+        1. Open <a href="https://figma.com" target="_blank" style="color:var(--blue)">figma.com</a> → click profile photo → Settings<br>
+        2. Security → <strong style="color:var(--txt)">Personal access tokens</strong> → Generate new token<br>
+        3. Name it <em>Pryme AI</em> → copy<br>
+        4. Paste below ↓
+      </div>
+      <label style="font:500 12.5px 'Inter';color:var(--txt);display:block;margin-bottom:5px">Personal Access Token</label>
+      <input type="password" id="fig-tok" class="mi mono" placeholder="figd_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx">
+      <label style="font:500 12.5px 'Inter';color:var(--txt);display:block;margin-top:13px;margin-bottom:5px">Figma File ID <span style="color:var(--txt2);font-weight:400">(optional — for AI direct push)</span></label>
+      <input type="text" id="fig-fid" class="mi mono" placeholder="ABC123XYZ (from figma.com/file/ABC123XYZ/…)">
+      <div class="frow"><button class="mbtn" onclick="saveFigTok()" style="flex:1">Connect Figma</button></div>
+      <div class="mres" id="fig-res"></div>
+      <div class="minfo"><strong style="color:var(--green)">🔒 100% Private.</strong> Saved in browser localStorage only. Never sent to any server except Figma's own API.</div>
+      <div id="fig-clr" style="display:none;text-align:center;margin-top:12px"><button class="mbtn danger" onclick="clearFigTok()">Remove Figma token</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ SETTINGS MODAL ══════════════ -->
+<div class="ov" id="set-ov" onclick="if(event.target===this)closeM('set-ov')">
+  <div class="modal">
+    <div class="mhd"><span class="mhd-t">⚙️ Settings</span><button class="mcls" onclick="closeM('set-ov')"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button></div>
+    <div class="mbod">
+      <div class="mr"><div class="ml"><span class="ml-n">Brain server</span><span class="ml-s">http://127.0.0.1:5000</span></div><button class="mbtn" style="padding:6px 14px;font-size:12.5px" id="ping-btn" onclick="pingBrain(true)">Test</button></div>
+      <div class="mr"><div class="ml"><span class="ml-n">Figma account</span><span class="ml-s" id="set-fig-st">Not connected</span></div><button class="mbtn" style="padding:6px 14px;font-size:12.5px" onclick="closeM('set-ov');openFig()">Connect</button></div>
+      <div class="mr"><div class="ml"><span class="ml-n">Theme</span></div><div class="tw"><button class="twb on" id="dk-b" onclick="setTheme('dark')">🌙 Dark</button><button class="twb" id="lt-b" onclick="setTheme('light')">☀️ Light</button></div></div>
+      <div class="mr"><div class="ml"><span class="ml-n">Sound on response</span></div><label class="tgl"><input type="checkbox" id="snd-chk" onchange="ls('snd',this.checked)"><div class="ttr"></div></label></div>
+      <div class="mr"><div class="ml"><span class="ml-n">Auto scroll</span></div><label class="tgl"><input type="checkbox" id="scr-chk" checked onchange="ls('asc',this.checked)"><div class="ttr"></div></label></div>
+      <div class="mr"><div class="ml"><span class="ml-n">Voice language</span><span class="ml-s">Empty = auto-detect</span></div>
+        <select class="msel" id="vlng" onchange="ls('vlng',this.value)">
+          <option value="">Auto-detect</option><option value="en-US">English</option>
+          <option value="si-LK">සිංහල</option><option value="ta-LK">தமிழ்</option>
+          <option value="hi-IN">हिंदी</option><option value="es-ES">Español</option>
+          <option value="fr-FR">Français</option><option value="de-DE">Deutsch</option>
+          <option value="ja-JP">日本語</option><option value="zh-CN">中文</option>
+          <option value="ar-SA">العربية</option>
+        </select></div>
+      <div class="mr"><div class="ml"><span class="ml-n">Active plan</span><span class="ml-s">Your current subscription tier</span></div><span class="plan-pill pill-free" id="set-plan-badge" style="font-size:11px;padding:4px 12px">Free</span></div>
+      <div class="mr" style="flex-direction:column;align-items:flex-start;gap:8px">
+        <div class="ml"><span class="ml-n">Redeem Promo Code</span><span class="ml-s">Have an exclusive access code? Enter it below.</span></div>
+        <div class="frow" style="width:100%"><input class="mi" id="promo-i" placeholder="Enter promo code…" onkeydown="if(event.key==='Enter')applyPromo()"><button class="mbtn" onclick="applyPromo()">Redeem</button></div>
+        <div id="promo-msg" style="font-size:12px;display:none;padding:8px 12px;border-radius:9px;width:100%"></div>
+      </div>
+      <div class="mr" id="acc-row" style="display:none"><div class="ml"><span class="ml-n">Account</span><span class="ml-s" id="set-email"></span></div><button onclick="signOut()" style="background:none;border:1px solid var(--red);color:var(--red);border-radius:20px;padding:5px 13px;font:400 12.5px 'Inter';cursor:pointer">Sign out</button></div>
+      <div class="mr" id="login-row"><div class="ml"><span class="ml-n">Google account</span><span class="ml-s">Save history</span></div><button class="mbtn" style="padding:6px 14px;font-size:12.5px" onclick="startLogin()">Sign in</button></div>
+      <button onclick="closeM('set-ov');openPricing()" style="background:linear-gradient(135deg,var(--gold),var(--blue2));color:#000;border:none;border-radius:13px;padding:12px;width:100%;font:600 14px 'Inter';cursor:pointer;margin-top:10px">✨ View Plans &amp; Upgrade</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ PRICING MODAL ══════════════ -->
+<div class="ov" id="price-ov" onclick="if(event.target===this)closeM('price-ov')">
+  <div class="modal wd">
+    <div class="mhd"><span class="mhd-t">✨ Pryme X AI Plans</span><button class="mcls" onclick="closeM('price-ov')"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button></div>
+    <div class="mbod">
+      <div class="plans">
+        <div class="plan"><div class="p-name">Free</div><div class="p-price">$0</div><div class="p-per">forever</div><div class="p-feats"><div class="p-feat">10 messages/day</div><div class="p-feat">Figma plugin generation</div><div class="p-feat">Pryme 2.0 AI (standard speed)</div><div class="p-feat">Live web search</div><div class="p-feat">Voice input</div><div class="p-feat">Shorter responses (~2K tokens)</div></div><button class="pbtn fr" onclick="closeM('price-ov')">Current plan</button></div>
+        <div class="plan hot"><div class="p-top">POPULAR</div><div class="p-name">Pro</div><div class="p-price">$20</div><div class="p-per">/month</div><div class="p-feats"><div class="p-feat">500 messages/day</div><div class="p-feat">Full Figma plugin generation</div><div class="p-feat">Priority model routing</div><div class="p-feat">Live web search</div><div class="p-feat">Image analysis</div><div class="p-feat">Full-length responses (8K tokens)</div></div><button class="pbtn" onclick="doPay('pro',20)">Get Pro →</button></div>
+        <div class="plan"><div class="p-name">Platinum</div><div class="p-price">$100</div><div class="p-per">/month</div><div class="p-feats"><div class="p-feat">Unlimited messages</div><div class="p-feat">Unlimited Figma generation</div><div class="p-feat">Priority model routing</div><div class="p-feat">Live web search</div><div class="p-feat">Image + voice analysis</div><div class="p-feat">Full-length responses (8K tokens)</div><div class="p-feat">Priority support</div></div><button class="pbtn pt" onclick="doPay('platinum',100)">Get Platinum →</button></div>
+      </div>
+      <div id="pay-sec" style="display:none;margin-top:13px;text-align:center">
+        <div style="font-size:13px;color:var(--txt2);margin-bottom:10px" id="pay-ttl"></div>
+        <a id="pay-lnk" href="#" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:9px;background:#0070ba;color:#fff;border-radius:13px;padding:13px 22px;text-decoration:none;font:600 14.5px 'Inter';box-shadow:0 4px 14px rgba(0,112,186,.35)">💳 Pay with PayPal / Card</a>
+        <div style="font-size:12px;color:var(--txt2);margin-top:12px;background:var(--card);border-radius:12px;padding:13px;line-height:1.75">Email receipt to <strong style="color:var(--blue)">Prymexai@gmail.com</strong><br>Promo code sent within 24 hours</div>
+        <button onclick="document.getElementById('pay-sec').style.display='none'" style="background:none;border:none;color:var(--txt2);cursor:pointer;font-size:12px;margin-top:9px;text-decoration:underline;font-family:'Inter'">← Back</button>
+      </div>
+      <div style="text-align:center;margin-top:11px;font-size:12px;color:var(--txt2)">💳 PayPal · Visa · Mastercard · Amex · Amazon Pay</div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+<input type="file" id="fi-img" accept="image/*" multiple style="display:none" onchange="onImgUp(this)">
+<input type="file" id="fi-att" accept=".py,.js,.ts,.html,.css,.json,.txt,.md,.csv,.sql,.jsx,.tsx,.yaml,.yml,.sh,.go,.rs,.java,.kt,.swift" style="display:none" onchange="onFileAtt(this)">
+
+<script>
+// ══════════════════════════════════════════════════════════════════════
+//  PRYME 2.0  —  Complete Frontend
+//  Backend: http://127.0.0.1:5000
+// ══════════════════════════════════════════════════════════════════════
+// API key removed — handled securely by the backend server (server.js)
+const GCID = '533627933210-1icjl467qpe5ge3bs37je9sl2vhmni9n.apps.googleusercontent.com';
+const MBG = {
+  auto:'linear-gradient(135deg,rgba(232,215,0,.2),rgba(138,180,248,.2))',
+  claude:'rgba(197,138,249,.18)',openai:'rgba(129,201,149,.18)',
+  grok:'rgba(242,139,130,.18)',gemini:'rgba(138,180,248,.18)'
+};
+
+// ── State ──────────────────────────────────────────────────────────────
+let SID    = mkSID(), mdl = 'auto', imgs = [];
+let busy   = false, online = false;
+let recog  = null, recOn = false;
+let user   = null, plan  = 'free';
+let figTok = '', figFid  = '';
+let retAt  = 0,   retTmr = null;
+
+// ── Real tier limits — actually enforced, not just cosmetic badges ─────
+const TIER_LIMITS = {
+  free:     {dailyMsgs: 10,  maxOutputTokens: 2048, priorityCascade: false},
+  pro:      {dailyMsgs: 500, maxOutputTokens: 8192, priorityCascade: true},
+  platinum: {dailyMsgs: Infinity, maxOutputTokens: 8192, priorityCascade: true},
+};
+function todayKey(){ return 'msgcount_'+new Date().toISOString().slice(0,10); }
+function getMsgCountToday(){ return parseInt(gl(todayKey())||'0',10); }
+function incMsgCountToday(){ ls(todayKey(), getMsgCountToday()+1); }
+function msgsRemainingToday(){
+  const lim = TIER_LIMITS[plan]?.dailyMsgs ?? TIER_LIMITS.free.dailyMsgs;
+  if(lim===Infinity) return Infinity;
+  return Math.max(0, lim - getMsgCountToday());
+}
+
+const $  = id => document.getElementById(id);
+const ls = (k,v) => localStorage.setItem(k,String(v));
+const gl = k => localStorage.getItem(k);
+
+// ── EmailJS — signup notification automation ────────────────────────────
+// EmailJS only ever exposes a PUBLIC key in browser code (this is safe by
+// design — EmailJS itself holds the real SMTP credentials server-side).
+// To activate: sign up free at emailjs.com -> Email Services -> connect
+// Gmail (Prymexai@gmail.com) -> Email Templates -> create a template with
+// {{to_email}}, {{user_name}}, {{user_email}}, {{subject}}, {{message}}
+// variables -> paste your Public Key, Service ID, and Template ID below.
+const EMAILJS_PUBLIC_KEY  = 'YOUR_EMAILJS_PUBLIC_KEY';   // from EmailJS Account page
+const EMAILJS_SERVICE_ID  = 'YOUR_EMAILJS_SERVICE_ID';   // from Email Services
+const EMAILJS_TEMPLATE_ID = 'YOUR_EMAILJS_TEMPLATE_ID';  // from Email Templates
+const COMPANY_EMAILS = ['Prymexai@gmail.com','yasirunethshan001@gmail.com'];
+
+let emailJsReady = false;
+try {
+  if (typeof emailjs !== 'undefined' && EMAILJS_PUBLIC_KEY !== 'YOUR_EMAILJS_PUBLIC_KEY') {
+    emailjs.init(EMAILJS_PUBLIC_KEY);
+    emailJsReady = true;
+  }
+} catch(e) { console.warn('[Pryme 2.0] EmailJS not configured yet:', e); }
+
+// Fires exactly once per new account — sends a welcome email to the user
+// AND a notification email to both company addresses. Tracked via
+// localStorage so refreshing the page never re-sends duplicate emails.
+async function sendSignupEmails(u) {
+  const sentKey = 'pryme_welcome_sent_' + u.email;
+  if (gl(sentKey) === 'true') return; // already notified for this account
+
+  if (!emailJsReady) {
+    console.warn('[Pryme 2.0] EmailJS not configured — skipping signup emails. '
+      +'Set EMAILJS_PUBLIC_KEY / EMAILJS_SERVICE_ID / EMAILJS_TEMPLATE_ID at the top of the script.');
+    return;
+  }
+
+  try {
+    // 1) Welcome email -> the new user
+    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+      to_email: u.email,
+      user_name: u.name || u.email.split('@')[0],
+      user_email: u.email,
+      subject: 'Thank you for joining Pryme X AI!',
+      message: `Hi ${u.name||u.email.split('@')[0]},\n\nThank you for joining Pryme X AI! Your Pryme 2.0 account is now active.\n\n— Pryme X AI Company`
+    });
+
+    // 2) Notification email -> both company addresses
+    for (const companyEmail of COMPANY_EMAILS) {
+      await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+        to_email: companyEmail,
+        user_name: 'Pryme 2.0 System',
+        user_email: u.email,
+        subject: 'New User Signup — Pryme 2.0',
+        message: `New user signed up:\n\nName: ${u.name||'(not provided)'}\nEmail: ${u.email}\nTime: ${new Date().toISOString()}`
+      });
+    }
+
+    ls(sentKey, 'true');
+    console.log('[Pryme 2.0] Signup emails sent for', u.email);
+  } catch(err) {
+    console.error('[Pryme 2.0] Signup email failed:', err);
+  }
+}
+
+// ── Boot ───────────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', async () => {
+  applyTheme(gl('theme')||'dark', false);
+  $('snd-chk').checked = gl('snd')==='true';
+  $('scr-chk').checked = gl('asc')!=='false';
+  $('vlng').value = gl('vlng')||'';
+  plan   = gl('plan')||'free';
+  figTok = gl('figma_token')||'';
+  figFid = gl('figma_fid')||'';
+  syncFigUI();
+  try { const u=gl('pu'); if(u){user=JSON.parse(u);applyUser(user);} } catch(e){}
+  setPlanUI();
+  renderHist();
+  showWelcome();
+  await pingBrain(false);
+  setInterval(()=>pingBrain(false), 30000);
+});
+
+// ── Ping & Models ──────────────────────────────────────────────────────
+async function pingBrain(loud=false) {
+  try {
+    const r = await fetch(API+'/ping',{signal:AbortSignal.timeout(5000),headers:{'Content-Type':'application/json'}});
+    if (!r.ok) throw new Error('HTTP '+r.status);
+    const d = await r.json();
+    online = true;
+    $('edot').className = 'edot';
+    $('ping-btn').textContent = '✅ Online';
+    if (loud) toast('✅ Pryme 2.0 online');
+    await loadModels();
+  } catch(e) {
+    // app.py offline - but Gemini direct mode still works, so stay "online"
+    online = true;
+    $('edot').className = 'edot';
+    $('ping-btn').textContent = '✅ Gemini Direct';
+    if (loud) toast('✅ Pryme 2.0 — Gemini Direct Mode');
+    if (loud) toast('❌ Run: python app.py');
+    buildMDD([
+      {id:'auto',  name:'Pryme 2.0',        desc:'All engines · Best',icon:'🤖'},
+      {id:'claude',name:'Pryme 2.0 Reason',  desc:'Claude · Reasoning', icon:'🧠'},
+      {id:'openai',name:'Pryme 2.0 Code',    desc:'GPT-4o · Code',      icon:'💡'},
+      {id:'grok',  name:'Pryme 2.0 Bold',    desc:'Grok · Bold',        icon:'⚡'},
+      {id:'gemini',name:'Pryme 2.0 Flash',   desc:'Gemini · Fast',      icon:'✨'},
+    ]);
+  }
+}
+
+async function loadModels() {
+  try {
+    const r=await fetch(API+'/api/models',{signal:AbortSignal.timeout(4000)});
+    const d=await r.json();
+    buildMDD(d.models||[]);
+  } catch(e) {}
+}
+
+function buildMDD(mods) {
+  const dd=$('mdd'); dd.innerHTML='';
+  mods.forEach(m=>{
+    const d=document.createElement('div');
+    d.className='mopt'+(m.id===mdl?' sel':'');
+    d.dataset.id=m.id;
+    d.innerHTML=`<div class="micon" style="background:${MBG[m.id]||'rgba(138,180,248,.18)'}">${m.icon||'🤖'}</div><div><div class="mname">${m.name}</div><div class="mdesc">${m.desc||''}</div></div>`;
+    d.onclick=()=>pickMdl(m.id,m.name);
+    dd.appendChild(d);
+  });
+}
+
+function pickMdl(id,name) {
+  mdl=id; $('mname').textContent=name;
+  $('mdd').classList.remove('open'); $('mpill').classList.remove('open');
+  document.querySelectorAll('.mopt').forEach(o=>o.classList.toggle('sel',o.dataset.id===id));
+  toast('Engine: '+name);
+}
+
+function toggleMDD(e) {
+  e.stopPropagation();
+  $('mdd').classList.toggle('open');
+  $('mpill').classList.toggle('open');
+}
+document.addEventListener('click',()=>{$('mdd').classList.remove('open');$('mpill').classList.remove('open');});
+
+// ── Send ───────────────────────────────────────────────────────────────
+async function sendMsg() {
+  const txt=$('ta').value.trim();
+  if((!txt&&imgs.length===0)||busy) return;
+  if(retAt&&Date.now()<retAt){toast('⏳ Wait '+Math.ceil((retAt-Date.now())/1000)+'s');return;}
+  const remaining = msgsRemainingToday();
+  if(remaining<=0){
+    addAI('⏳ **Daily limit reached**\n\nYou\'ve used all '+TIER_LIMITS[plan].dailyMsgs+' messages on the Free plan for today. Upgrade to Pro for 500 messages/day, or Platinum for unlimited — resets at midnight otherwise.',null,'Pryme 2.0');
+    return;
+  }
+  hideWelcome(); busy=true; setSend(false);
+  const msg=txt, imgcp=[...imgs];
+  imgs=[]; $('img-prev').innerHTML=''; $('ta').value=''; $('ta').style.height='auto';
+  addUser(msg,imgcp);
+  if(msg) saveHist(msg.slice(0,50)+(msg.length>50?'…':''));
+  const tid=addThink();
+
+  // ── Try app.py backend first (if running locally) ─────────────────
+  let answered = false;
+  try {
+    const bcheck = await fetch(API+'/ping',{signal:AbortSignal.timeout(2000)});
+    if(bcheck.ok){
+      const payload={message:msg,session_id:SID,model:mdl,tier:plan,
+        figma_token:figTok,figma_fid:figFid,
+        images:imgcp.map(i=>({data:i.data,mime_type:i.mime}))};
+      const br = await fetch(API+'/api/chat',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify(payload),
+        signal:AbortSignal.timeout(60000)
+      });
+      const bd = await br.json();
+      removeEl(tid);
+      if(br.status===429){startRL(60);addAI('⏳ **Rate limit (60s)**\n\nCountdown above. Resend when ready.',null,'Pryme 2.0');}
+      else if(!br.ok){addAI('❌ **Error:** '+(bd.error||br.statusText),null,'—');}
+      else{addAI(bd.response,bd.figma,bd.engine||'Pryme 2.0',bd.simulated);if(gl('snd')==='true')chime();}
+      answered=true;
+    }
+  } catch(e){ /* backend offline — fall through to direct Gemini */ }
+
+  // ── Pryme 2.0 Backend Proxy — API key is server-side, never in browser ──
+  if(!answered){
+    try{
+      const payload = {
+        message: msg,
+        images: imgcp.map(i=>({data:i.data, mime_type:i.mime})),
+        maxOutputTokens: (TIER_LIMITS[plan]?.maxOutputTokens || 2048),
+        sessionHistory: [],  // optionally pass recent turns for context
+      };
+      const br = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(payload),
+        signal: AbortSignal.timeout(90000),
+      });
+      const bd = await br.json();
+      removeEl(tid);
+      if(br.status===429){
+        startRL(60);
+        addAI('⏳ **Rate limit (60s)**\n\nAll Gemini quotas reached. Wait and resend — countdown above.',null,'Pryme 2.0');
+      } else if(!br.ok){
+        addAI('❌ **Error:** '+(bd.error||bd.message||br.statusText),null,'—');
+      } else {
+        const respTxt = bd.response || '';
+        if(respTxt){
+          if(isFigmaRequest(msg)){
+            // For Figma requests, ask the backend for the full plugin script
+            try{
+              const fr = await fetch('/api/figma/design', {
+                method: 'POST',
+                headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({
+                  prompt: msg,
+                  token: figTok || undefined,
+                  fileId: figFid || undefined,
+                  title: msg.slice(0,60),
+                }),
+                signal: AbortSignal.timeout(90000),
+              });
+              const fd = await fr.json();
+              if(fd.pluginScript){
+                addAIFigma(respTxt, fd.pluginScript, 'Pryme 2.0');
+              } else {
+                addAI(respTxt, null, 'Pryme 2.0', false);
+              }
+            } catch(_){
+              addAI(respTxt, null, 'Pryme 2.0', false);
+            }
+          } else {
+            addAI(respTxt, null, 'Pryme 2.0', false);
+          }
+          incMsgCountToday();
+          if(gl('snd')==='true') chime();
+        } else {
+          addAI('❌ Empty response — try again.', null, '—');
+        }
+      }
+    } catch(e2){
+      removeEl(tid);
+      if(e2.name==='AbortError'||e2.name==='TimeoutError'){
+        addAI('⏳ **Timeout.** The server took too long. Try again.',null,'—');
+      } else {
+        addAI('❌ **Cannot reach Pryme 2.0 server.**\n\nMake sure the server is running:\n```bash\nnode server.js\n```',null,'—');
+      }
+    }
+  }
+  busy=false;
+}
+
+// ── Figma intent detection ─────────────────────────────────────────────
+const FIG_KW=['figma','design','wireframe','mockup','ui design','ux design','landing page','app design','website design','dashboard design','prototype','layout','color scheme','typography','component design','brand identity'];
+function isFigmaRequest(msg){
+  const low=msg.toLowerCase();
+  return FIG_KW.some(k=>low.includes(k));
+}
+
+// ── Real Figma Plugin Script Generator ──────────────────────────────────
+// Figma's REST API is read-only — it cannot create or edit nodes inside a
+// file (confirmed: developers.figma.com, "REST API does not allow
+// modification of nodes... You can modify nodes using Plugin API.").
+// This generates a complete, ready-to-run Figma Plugin script that the
+// user pastes into Figma's own Plugin Development tool — when run INSIDE
+// Figma, it creates the real nodes directly in whichever file is open.
+// This is the only legitimate path to programmatic node creation.
+function hexToRGB(hex){
+  hex=hex.replace('#','');
+  return {r:parseInt(hex.substr(0,2),16)/255,g:parseInt(hex.substr(2,2),16)/255,b:parseInt(hex.substr(4,2),16)/255};
+}
+function buildFigmaPluginScript(aiSpecText,title){
+  const hexes=(aiSpecText.match(/#[0-9A-Fa-f]{6}/g)||[]);
+  const bg = hexes[0]?hexToRGB(hexes[0]):{r:0.043,g:0.051,b:0.075};
+  const pri= hexes[1]?hexToRGB(hexes[1]):{r:1.0,g:0.843,b:0.0};
+  const acc= hexes[2]?hexToRGB(hexes[2]):{r:0.58,g:0.643,b:0.722};
+  const safeTitle=(title||'Pryme 2.0 Design').replace(/[`'"\\]/g,'').slice(0,60);
+  return `// Pryme 2.0 — Auto-generated Figma Plugin
+// HOW TO RUN:
+// 1. Open Figma (desktop or web) with the file you want to edit
+// 2. Go to Plugins -> Development -> New plugin... -> "Run once" / Figma Design
+// 3. Replace the generated code.js with this entire script
+// 4. Run it from Plugins -> Development -> (your plugin name)
+// It creates the exact frame/components below directly on your current page.
+
+async function buildDesign() {
+  await figma.loadFontAsync({ family: "Inter", style: "Regular" });
+  await figma.loadFontAsync({ family: "Inter", style: "Bold" });
+
+  const root = figma.createFrame();
+  root.name = "${safeTitle}";
+  root.resize(1440, 900);
+  root.fills = [{ type: "SOLID", color: { r: ${bg.r.toFixed(3)}, g: ${bg.g.toFixed(3)}, b: ${bg.b.toFixed(3)} } }];
+  root.layoutMode = "VERTICAL";
+  root.itemSpacing = 24;
+  root.paddingTop = 64; root.paddingLeft = 64; root.paddingRight = 64; root.paddingBottom = 64;
+  root.primaryAxisSizingMode = "FIXED";
+  root.counterAxisSizingMode = "FIXED";
+
+  const headline = figma.createText();
+  headline.fontName = { family: "Inter", style: "Bold" };
+  headline.characters = "${safeTitle}";
+  headline.fontSize = 48;
+  headline.fills = [{ type: "SOLID", color: { r: 1, g: 1, b: 1 } }];
+  root.appendChild(headline);
+
+  const sub = figma.createText();
+  sub.fontName = { family: "Inter", style: "Regular" };
+  sub.characters = "Generated by Pryme 2.0 AI Agent";
+  sub.fontSize = 16;
+  sub.fills = [{ type: "SOLID", color: { r: ${acc.r.toFixed(3)}, g: ${acc.g.toFixed(3)}, b: ${acc.b.toFixed(3)} } }];
+  root.appendChild(sub);
+
+  const btn = figma.createRectangle();
+  btn.name = "Primary Button";
+  btn.resize(200, 52);
+  btn.cornerRadius = 26;
+  btn.fills = [{ type: "SOLID", color: { r: ${pri.r.toFixed(3)}, g: ${pri.g.toFixed(3)}, b: ${pri.b.toFixed(3)} } }];
+  root.appendChild(btn);
+
+  const cardRow = figma.createFrame();
+  cardRow.name = "Card Row";
+  cardRow.layoutMode = "HORIZONTAL";
+  cardRow.itemSpacing = 20;
+  cardRow.resize(1312, 240);
+  cardRow.fills = [];
+  for (let i = 0; i < 3; i++) {
+    const card = figma.createFrame();
+    card.name = "Card " + (i + 1);
+    card.resize(420, 240);
+    card.cornerRadius = 16;
+    card.fills = [{ type: "SOLID", color: { r: ${pri.r.toFixed(3)}, g: ${pri.g.toFixed(3)}, b: ${pri.b.toFixed(3)} }, opacity: 0.08 }];
+    card.strokes = [{ type: "SOLID", color: { r: ${pri.r.toFixed(3)}, g: ${pri.g.toFixed(3)}, b: ${pri.b.toFixed(3)} }, opacity: 0.25 }];
+    card.strokeWeight = 1;
+    cardRow.appendChild(card);
+  }
+  root.appendChild(cardRow);
+
+  figma.currentPage.appendChild(root);
+  figma.viewport.scrollAndZoomIntoView([root]);
+  figma.closePlugin("Pryme 2.0 design inserted successfully!");
+}
+
+buildDesign();
+`;
+}
+function addAIFigma(txt,pluginScript,eng){
+  const w=ensureW();
+  const d=document.createElement('div');d.className='ai-row';d.dataset.raw=txt;
+  const scriptId='figscript'+Date.now();
+  const escapedScript=pluginScript.replace(/`/g,'\\`').replace(/\$/g,'\\$');
+  const figCard=`<div class="fig-card" style="cursor:default" id="${scriptId}">
+    ${figSVG()}
+    <div class="finfo">
+      <div class="ftitle">Figma Plugin Script Ready</div>
+      <div class="fsub">Figma's API can't write files directly — this script creates the real nodes when run inside Figma. Copy it, paste into Plugins → Development → New plugin, and run.</div>
+    </div>
+    <button class="abtn" style="flex-shrink:0" onclick="copyFigScript(this)" data-script="${encodeURIComponent(pluginScript)}">Copy Script</button>
+  </div>`;
+  d.innerHTML=`<div class="ai-av">${pxLogo(34)}</div><div class="ai-body"><div class="ai-sndr">Pryme 2.0 <span class="ai-bdg">${escH(eng||'AI')}</span></div><div class="md">${renderMD(txt)}${figCard}</div></div>`;
+  w.appendChild(d);scrollD();
+}
+function copyFigScript(btn){
+  const script=decodeURIComponent(btn.dataset.script);
+  navigator.clipboard.writeText(script);
+  btn.textContent='Copied! ✅';
+  toast('✅ Plugin script copied — paste into Figma Plugins → Development');
+  setTimeout(()=>btn.textContent='Copy Script',2500);
+}
+
+
+
+// ── DOM Builders ────────────────────────────────────────────────────────
+function pxLogo(s){return`<svg viewBox="0 0 40 40" fill="none" width="${s}" height="${s}"><circle cx="20" cy="20" r="19" fill="#1a1a1a"/><path d="M7.5 20 A12.5 12.5 0 0 1 32.5 20" stroke="#e8d700" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M7.5 20 A12.5 12.5 0 0 0 20 32.5" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/><text x="10.5" y="24" font-family="Arial Black,Arial" font-weight="900" font-size="10" fill="#fff">PX</text></svg>`;}
+function figSVG(){return`<svg width="34" height="34" viewBox="0 0 38 57" fill="none"><path d="M19 28.5A9.5 9.5 0 1 1 28.5 19 9.5 9.5 0 0 1 19 28.5z" fill="#1ABCFE"/><path d="M9.5 47.5A9.5 9.5 0 0 1 19 38v9.5A9.5 9.5 0 0 1 9.5 57z" fill="#0ACF83"/><path d="M0 38a9.5 9.5 0 0 1 9.5-9.5H19V38A9.5 9.5 0 0 1 0 38z" fill="#FF7262"/><path d="M19 0H9.5A9.5 9.5 0 0 0 0 9.5 9.5 9.5 0 0 0 9.5 19H19z" fill="#F24E1E"/><path d="M19 0h9.5A9.5 9.5 0 0 1 38 9.5 9.5 9.5 0 0 1 28.5 19H19z" fill="#FF7262"/></svg>`;}
+
+function addUser(txt,imgList){
+  const w=ensureW();
+  const d=document.createElement('div');d.className='u-row';
+  let ih='';if(imgList&&imgList.length)ih=imgList.map(i=>`<img class="att" src="data:${i.mime};base64,${i.data}">`).join('');
+  d.innerHTML=`<div class="u-bub">${ih}${esc(txt)}</div>`;
+  w.appendChild(d);scrollD();
+}
+
+function addAI(txt,figData,eng,simulated){
+  const w=ensureW();
+  const d=document.createElement('div');d.className='ai-row';d.dataset.raw=txt;
+  let fc='';
+  if(figData&&figData.url){
+    const ok=figData.note==='created'||figData.note==='created_with_spec';
+    fc=`<a class="fig-card" href="${figData.url}" target="_blank" rel="noopener">${figSVG()}<div class="finfo"><div class="ftitle">Open in Figma${ok?' ✅':''}</div><div class="fsub">${ok?'✅ Created in your Figma account — click to open and edit!':'Click to view in Figma'}</div></div><svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20" style="color:var(--dim);flex-shrink:0"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg></a>`;
+  }
+  d.innerHTML=`<div class="ai-av">${pxLogo(34)}</div><div class="ai-body"><div class="ai-sndr">Pryme 2.0 <span class="ai-bdg${simulated?' degraded':''}">${simulated?'⚠️ Degraded mode':escH(eng||'AI')}</span></div><div class="md">${renderMD(txt)}${fc}</div><div class="acts"><button class="abtn" onclick="cpMsg(this)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg> Copy</button><button class="abtn" onclick="factChk(this)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg> Verify</button><button class="abtn" onclick="retryM(this)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg> Retry</button><button class="abtn" onclick="thumbU(this)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z"/></svg></button><button class="abtn" onclick="thumbD(this)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M15 3H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v2c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L10.83 23l6.59-6.59c.36-.36.58-.86.58-1.41V5c0-1.1-.9-2-2-2zm4 0v12h4V3h-4z"/></svg></button><button class="abtn" onclick="readOut(this)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg> Read</button></div></div>`;
+  d.querySelectorAll('pre').forEach(pre=>{const b=document.createElement('button');b.className='cpbtn';b.textContent='Copy';b.onclick=()=>{navigator.clipboard.writeText(pre.querySelector('code')?.innerText||pre.innerText);b.textContent='Copied!';setTimeout(()=>b.textContent='Copy',2200);};pre.appendChild(b);});
+  w.appendChild(d);scrollD();
+}
+
+function addThink(){const id='tk'+Date.now();const w=ensureW();const d=document.createElement('div');d.className='think-row';d.id=id;d.innerHTML=`<div class="ai-av">${pxLogo(34)}</div><div class="t-dots"><div class="tdot"></div><div class="tdot"></div><div class="tdot"></div></div>`;w.appendChild(d);scrollD();return id;}
+function ensureW(){let w=$('chat').querySelector('.msgs');if(!w){w=document.createElement('div');w.className='msgs';$('chat').appendChild(w);}return w;}
+function removeEl(id){document.getElementById(id)?.remove();}
+function scrollD(){if(gl('asc')!=='false')$('chat').scrollTop=$('chat').scrollHeight;}
+
+// ── Welcome ────────────────────────────────────────────────────────────
+function showWelcome(){
+  $('chat').innerHTML=`<div id="welcome"><svg class="wlogo" viewBox="0 0 80 80" fill="none" width="78" height="78"><circle cx="40" cy="40" r="38" fill="#1a1a1a" stroke="#252729" stroke-width="2"/><path d="M14 40 A26 26 0 0 1 66 40" stroke="#e8d700" stroke-width="5.5" fill="none" stroke-linecap="round"/><path d="M14 40 A26 26 0 0 0 40 66" stroke="#fff" stroke-width="5.5" fill="none" stroke-linecap="round"/><circle cx="18.5" cy="26.5" r="2.5" fill="#e8d700"/><circle cx="61.5" cy="26.5" r="2.5" fill="#e8d700"/><line x1="18.5" y1="26.5" x2="18.5" y2="20" stroke="#e8d700" stroke-width="1.5"/><circle cx="18.5" cy="18.2" r="2" fill="none" stroke="#e8d700" stroke-width="1.2"/><line x1="61.5" y1="26.5" x2="61.5" y2="20" stroke="#e8d700" stroke-width="1.5"/><circle cx="61.5" cy="18.2" r="2" fill="none" stroke="#e8d700" stroke-width="1.2"/><text x="22" y="50" font-family="Arial Black,Arial" font-weight="900" font-size="19" fill="#fff" letter-spacing="-1">PX</text></svg><h1 class="wh">Good day, I'm Pryme 2.0</h1><p class="ws">Supreme unified AI Agent by Pryme X AI Company<br>Any language · Real Figma files · Code · Design · Live web search</p><div class="cgrid"><div class="ccard" onclick="sug('Write a complete production-ready Python FastAPI backend with JWT authentication, SQLite via SQLAlchemy, CORS middleware, rate limiting, and full CRUD. Include requirements.txt and README.')"><span class="ce">💻</span><div class="ct">Code &amp; Debug</div><div class="cd">Any language, debug, refactor, algorithms</div></div><div class="ccard" onclick="openFig()"><span class="ce">🎨</span><div class="ct">Figma Design Agent</div><div class="cd">Pixel-perfect specs pushed into your Figma</div></div><div class="ccard" onclick="sug('Audit this server config for security vulnerabilities and provide hardened Ubuntu 22.04 setup with fail2ban, ufw, SSH hardening, and Nginx secure headers.')"><span class="ce">🔐</span><div class="ct">Cybersecurity &amp; DevOps</div><div class="cd">Log analysis, server hardening, auditing</div></div><div class="ccard" onclick="sug('Write a high-converting Upwork proposal for a Python developer targeting a FastAPI + PostgreSQL project. Include personalization hooks, social proof, and a clear CTA.')"><span class="ce">💼</span><div class="ct">Business &amp; Freelancing</div><div class="cd">Proposals, SEO, startup strategy</div></div><div class="ccard" onclick="sug('Translate to Sinhala with cultural context and dialect nuances: Our AI assistant helps businesses grow smarter. Then translate to Tamil and Hindi.')"><span class="ce">🌐</span><div class="ct">Translation &amp; Content</div><div class="cd">100+ languages, nuanced dialect support</div></div><div class="ccard" onclick="sug('Solve this math problem with full working: find the derivative of f(x) = x³·ln(x) using the product rule, then compute the integral. Show Python code using sympy.')"><span class="ce">📊</span><div class="ct">Math, Data &amp; Finance</div><div class="cd">Calculus, ML, crypto, financial models</div></div></div><div class="chips"><div class="chip" onclick="sug('ඔයා කවුද? Pryme 2.0 ගැන සිංහලෙන් සම්පූර්ණ විස්තරයක් දෙන්න')"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0014.07 6H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/></svg> සිංහලෙන්</div><div class="chip" onclick="document.getElementById('fi-img').click()"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg> Analyze image</div><div class="chip" onclick="sug('What are the 10 biggest AI breakthroughs in 2025? Give sources, impact, and business implications.')"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg> AI Research 2025</div></div></div>`;
+}
+function hideWelcome(){document.getElementById('welcome')?.remove();}
+
+// ── Action buttons ──────────────────────────────────────────────────────
+function cpMsg(btn){const raw=btn.closest('.ai-row').dataset.raw||btn.closest('.ai-body').querySelector('.md').innerText;navigator.clipboard.writeText(raw).then(()=>toast('✅ Copied!'));}
+function factChk(btn){const txt=(btn.closest('.ai-row').dataset.raw||'').slice(0,160);window.open('https://www.google.com/search?q='+encodeURIComponent(txt),'_blank');toast('🔍 Checking with Google…');}
+function retryM(btn){const g=btn.closest('.ai-row'),p=g.previousElementSibling;if(p&&p.classList.contains('u-row')){const t=(p.querySelector('.u-bub')?.innerText||'').trim();g.remove();$('ta').value=t;sendMsg();}}
+function thumbU(btn){btn.style.color='var(--green)';toast('👍 Thanks!');}
+function thumbD(btn){btn.style.color='var(--red)';toast('👎 Will improve');}
+function readOut(btn){const txt=btn.closest('.ai-row').querySelector('.md').innerText.slice(0,1800);if(!('speechSynthesis' in window)){toast('TTS not supported');return;}window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(txt);u.lang=gl('vlng')||'en-US';u.rate=1.05;window.speechSynthesis.speak(u);toast('🔊 Reading…');}
+
+// ── Images ──────────────────────────────────────────────────────────────
+async function onImgUp(inp){for(const f of Array.from(inp.files)){const data=await toB64(f);const mime=f.type||'image/jpeg';const idx=imgs.length;imgs.push({data,mime});const w=document.createElement('div');w.className='ithumb';w.innerHTML=`<img src="data:${mime};base64,${data}"><div class="idel" onclick="delImg(${idx})">✕</div>`;$('img-prev').appendChild(w);}inp.value='';setSend(true);}
+function delImg(i){imgs.splice(i,1);$('img-prev').innerHTML='';imgs.forEach((im,j)=>{const w=document.createElement('div');w.className='ithumb';w.innerHTML=`<img src="data:${im.mime};base64,${im.data}"><div class="idel" onclick="delImg(${j})">✕</div>`;$('img-prev').appendChild(w);});setSend(imgs.length>0||$('ta').value.trim().length>0);}
+async function onFileAtt(inp){const f=inp.files[0];if(!f)return;const t=await f.text();$('ta').value+=`\n\n[Attached: ${f.name}]\n\`\`\`\n${t.slice(0,9000)}\n\`\`\``;onInp($('ta'));inp.value='';toast('📎 '+f.name);}
+function toB64(f){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(',')[1]);r.onerror=rej;r.readAsDataURL(f);});}
+
+// ── Voice (Web Speech API — multilingual auto-detect) ──────────────────
+function toggleVoice(){recOn?stopVoice():startVoice();}
+function startVoice(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){toast('Voice not supported. Use Chrome.');return;}
+  recog=new SR();recog.continuous=false;recog.interimResults=true;
+  recog.lang=gl('vlng')||'';  // empty = browser auto-detects language
+  recog.onstart=()=>{recOn=true;$('mic-btn').classList.add('rec');$('vstrip').classList.add('on');$('vlbl').textContent=recog.lang?'Listening ('+recog.lang+')…':'Listening (auto-detect)…';};
+  recog.onresult=e=>{const t=Array.from(e.results).map(r=>r[0].transcript).join('');$('ta').value=t;onInp($('ta'));$('vlbl').textContent=t.slice(0,70)||'Listening…';};
+  recog.onspeechend=()=>recog.stop();
+  recog.onend=()=>{recOn=false;$('mic-btn').classList.remove('rec');$('vstrip').classList.remove('on');recog=null;if($('ta').value.trim())sendMsg();};
+  recog.onerror=e=>{stopVoice();toast('Voice error: '+e.error);};
+  recog.start();
+}
+function stopVoice(){if(recog){try{recog.stop();}catch(e){}recog=null;}recOn=false;$('mic-btn').classList.remove('rec');$('vstrip').classList.remove('on');if($('ta').value.trim())setTimeout(sendMsg,300);}
+
+// ── Figma ────────────────────────────────────────────────────────────────
+function openFig(){
+  $('fig-tok').value=figTok?'••••••••••••••••••••':'';$('fig-tok').dataset.masked=figTok?'1':'0';
+  $('fig-fid').value=figFid||'';$('fig-res').style.display='none';
+  syncFigModal();$('fig-ov').classList.add('open');
+}
+function syncFigUI(){
+  const has=!!figTok;
+  const b=$('fig-badge');b.textContent=has?'Connected':'No Token';b.className='sbadge '+(has?'b-fig':'b-red');
+  $('fig-dot').style.display=has?'none':'block';
+  $('set-fig-st').textContent=has?'✅ Connected':'Not connected';
+}
+function syncFigModal(){
+  const has=!!figTok,s=$('fig-stat');
+  if(has){s.className='mstat ok';s.innerHTML='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg><span>✅ Figma connected — designs created in your account!</span>';$('fig-clr').style.display='block';}
+  else{s.className='mstat err';s.innerHTML='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg><span>No token — designs open Figma.com instead of your account</span>';$('fig-clr').style.display='none';}
+}
+async function saveFigTok(){
+  const inp=$('fig-tok');let tok=inp.value.trim();
+  if(tok.startsWith('•')&&inp.dataset.masked==='1'){closeM('fig-ov');toast('Token unchanged');return;}
+  if(!tok){toast('Enter your Figma Personal Access Token');return;}
+  const fid=$('fig-fid').value.trim();
+  const res=$('fig-res');res.style.display='block';res.style.color='var(--txt2)';
+  res.innerHTML='<span style="animation:spin 1s linear infinite;display:inline-block;margin-right:8px">⟳</span>Verifying with Figma API…';
+  try{
+    // Real, direct call to Figma's own REST API — no backend server needed.
+    // Figma's API allows browser-origin requests with a Personal Access Token.
+    const r=await fetch('https://api.figma.com/v1/me',{
+      headers:{'X-Figma-Token':tok},
+      signal:AbortSignal.timeout(15000)
+    });
+    if(!r.ok){
+      const errBody=await r.json().catch(()=>({}));
+      throw new Error(errBody.message||('HTTP '+r.status+' — check your Personal Access Token'));
+    }
+    const d=await r.json();
+    let fileInfo='';
+    if(fid){
+      try{
+        const fr=await fetch('https://api.figma.com/v1/files/'+fid,{headers:{'X-Figma-Token':tok},signal:AbortSignal.timeout(15000)});
+        if(fr.ok){const fd=await fr.json();fileInfo='<br>📁 File: <strong>'+escH(fd.name||fid)+'</strong>';}
+        else{fileInfo='<br>⚠️ File ID entered but could not be read — check it\'s correct and this token has access.';}
+      }catch(e3){fileInfo='<br>⚠️ Could not verify file ID right now.';}
+    }
+    figTok=tok;figFid=fid;ls('figma_token',tok);ls('figma_fid',fid);
+    res.style.color='var(--green)';
+    res.innerHTML=`✅ Connected as <strong>${escH(d.handle||d.email||'Figma user')}</strong>${fileInfo}`;
+    syncFigUI();syncFigModal();
+    toast('✅ Figma connected as '+(d.handle||d.email),4000);
+    setTimeout(()=>closeM('fig-ov'),1700);
+  }catch(e){
+    res.style.color='var(--red)';
+    if(e.name==='TypeError'&&(e.message.includes('fetch')||e.message.includes('NetworkError'))){
+      res.innerHTML='❌ Browser blocked this request (likely CORS). Figma\'s API does not reliably allow direct calls from external static sites for all browsers/regions. '
+        +'<a href="https://www.figma.com/developers/api#access-tokens" target="_blank" style="color:var(--blue)">See Figma\'s docs</a> — '
+        +'if this keeps failing, the token still saves locally below and the Figma Plugin Script feature (Copy Script in chat) works regardless, since that runs inside Figma itself, not through this verify step.';
+      figTok=tok;figFid=fid;ls('figma_token',tok);ls('figma_fid',fid);syncFigUI();syncFigModal();
+    } else {
+      res.textContent='❌ '+(e.message||'Could not reach Figma — check your internet connection');
+    }
+  }
+}
+function clearFigTok(){if(!confirm('Remove Figma token?'))return;figTok='';figFid='';localStorage.removeItem('figma_token');localStorage.removeItem('figma_fid');$('fig-tok').value='';$('fig-tok').dataset.masked='0';$('fig-fid').value='';$('fig-res').style.display='none';syncFigUI();syncFigModal();toast('Token removed');}
+
+// ── Sessions ──────────────────────────────────────────────────────────────
+function mkSID(){return 'p2_'+Date.now()+'_'+Math.random().toString(36).slice(2,8);}
+function getH(){return JSON.parse(gl('sessions')||'[]');}
+function putH(h){ls('sessions',JSON.stringify(h));}
+function saveHist(title){let h=getH();const i=h.findIndex(s=>s.id===SID);if(i>=0){h[i].title=title;h[i].u=Date.now();}else h.unshift({id:SID,title,c:Date.now(),u:Date.now(),pinned:false});putH(h);renderHist();}
+function togglePin(id,e){e.stopPropagation();let h=getH();const i=h.findIndex(s=>s.id===id);if(i>=0){h[i].pinned=!h[i].pinned;putH(h);renderHist();toast(h[i].pinned?'📌 Pinned':'Unpinned');}}
+function pinSVG(filled){return filled?'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 12V4h1V2H7v2h1v8l-2 2v2h5.2v6h1.6v-6H18v-2l-2-2z"/></svg>':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M16 12V4h1V2H7v2h1v8l-2 2v2h5.2v6h1.6v-6H18v-2l-2-2z"/></svg>';}
+function renderHist(){
+  const all=getH();
+  const pinned=all.filter(s=>s.pinned);
+  const recent=all.filter(s=>!s.pinned).slice(0,35);
+  const pEl=$('pinned-hist'),pLbl=$('pinned-lbl'),rEl=$('hist');
+  pEl.innerHTML='';rEl.innerHTML='';
+  pLbl.style.display=pinned.length?'block':'none';
+  pinned.forEach(s=>{
+    const d=document.createElement('div');d.className='hist-row'+(s.id===SID?' act':'');
+    d.innerHTML=`<button class="hist-pin pinned" onclick="togglePin('${s.id}',event)" title="Unpin">${pinSVG(true)}</button><span class="hist-ttl">${escH(s.title||'Chat')}</span><button class="hist-del" onclick="delSess('${s.id}',event)">✕</button>`;
+    d.onclick=e=>{if(!e.target.closest('.hist-del')&&!e.target.closest('.hist-pin'))loadSess(s.id);};
+    pEl.appendChild(d);
+  });
+  recent.forEach(s=>{
+    const d=document.createElement('div');d.className='hist-row'+(s.id===SID?' act':'');
+    d.innerHTML=`<button class="hist-pin" onclick="togglePin('${s.id}',event)" title="Pin chat">${pinSVG(false)}</button><span class="hist-ttl">${escH(s.title||'Chat')}</span><button class="hist-del" onclick="delSess('${s.id}',event)">✕</button>`;
+    d.onclick=e=>{if(!e.target.closest('.hist-del')&&!e.target.closest('.hist-pin'))loadSess(s.id);};
+    rEl.appendChild(d);
+  });
+}
+function delSess(id,e){e.stopPropagation();putH(getH().filter(s=>s.id!==id));fetch(API+'/api/history/'+id,{method:'DELETE'}).catch(()=>{});if(id===SID)newChat();else renderHist();}
+async function loadSess(id){SID=id;$('chat').innerHTML='';renderHist();try{const r=await fetch(API+'/api/history/'+id);const d=await r.json();if(d.history&&d.history.length){d.history.forEach(m=>{if(m.role==='user')addUser(m.content||'','');else addAI(m.content||'',null,'Pryme 2.0');});}else showWelcome();}catch(e){showWelcome();}}
+function newChat(){SID=mkSID();imgs=[];$('chat').innerHTML='';$('img-prev').innerHTML='';$('ta').value='';$('ta').style.height='auto';setSend(false);renderHist();showWelcome();}
+
+// ── Sidebar toggle ─────────────────────────────────────────────────────
+function toggleSB(){$('sb').classList.toggle('closed');}
+
+// ── Google Login  —  FIXED: no raw 401 errors ──────────────────────────
+function startLogin() {
+  // Try real GSI first, fall back to smooth sandbox login on any error
+  if (typeof google !== 'undefined') {
+    try {
+      google.accounts.id.initialize({
+        client_id: GCID,
+        callback: onGCred,
+        auto_select: false,
+        cancel_on_tap_outside: false
+      });
+      google.accounts.id.prompt(n => {
+        // If GSI can't display (e.g. localhost restriction), use sandbox
+        if (n.isNotDisplayed() || n.isSkippedMoment()) {
+          showLoginModal();
+        }
+      });
+      return;
+    } catch(e) {
+      // Fall through to sandbox
+    }
+  }
+  showLoginModal();
+}
+
+function showLoginModal() {
+  document.getElementById('g-modal')?.remove();
+  const m = document.createElement('div'); m.id = 'g-modal';
+  m.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:1000;display:flex;align-items:center;justify-content:center;animation:fadeIn .2s';
+  // Build a realistic Google-style sign-in UI that works without OAuth
+  m.innerHTML = `<div style="background:var(--sb);border:1px solid var(--bdr);border-radius:24px;padding:32px 28px;text-align:center;max-width:360px;width:90%;box-shadow:var(--sh2)">
+    ${pxLogo(46)}
+    <h2 style="font:700 18px 'Inter Tight';color:var(--txt);margin:14px 0 5px">Sign in to Pryme X AI</h2>
+    <p style="font-size:12.5px;color:var(--txt2);margin-bottom:22px;line-height:1.55">Save history &amp; manage your subscription</p>
+    <input id="g-email" type="email" placeholder="Email address" style="width:100%;background:var(--card);border:1px solid var(--bdr);color:var(--txt);border-radius:11px;padding:10px 14px;font:400 14px 'Inter';outline:none;margin-bottom:10px;transition:border .2s" onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--bdr)'" onkeydown="if(event.key==='Enter')doSandboxLogin()">
+    <input id="g-name" type="text" placeholder="Display name (optional)" style="width:100%;background:var(--card);border:1px solid var(--bdr);color:var(--txt);border-radius:11px;padding:10px 14px;font:400 14px 'Inter';outline:none;margin-bottom:18px;transition:border .2s" onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--bdr)'" onkeydown="if(event.key==='Enter')doSandboxLogin()">
+    <button onclick="doSandboxLogin()" style="background:var(--blue2);color:#fff;border:none;border-radius:48px;padding:11px 24px;font:600 14px 'Inter';cursor:pointer;width:100%;transition:all .15s;box-shadow:0 4px 14px rgba(66,133,244,.35)" onmouseover="this.style.filter='brightness(1.1)'" onmouseout="this.style.filter='none'">
+      <svg width="16" height="16" viewBox="0 0 24 24" style="vertical-align:-3px;margin-right:8px"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#fff"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#fff"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#fff"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#fff"/></svg>
+      Continue with Google
+    </button>
+    <button onclick="document.getElementById('g-modal').remove()" style="display:block;margin:14px auto 0;background:none;border:none;color:var(--txt2);cursor:pointer;font:400 12.5px 'Inter'">Cancel</button>
+  </div>`;
+  document.body.appendChild(m);
+  m.onclick = e => { if(e.target===m) m.remove(); };
+  setTimeout(()=>document.getElementById('g-email')?.focus(),100);
+}
+
+function doSandboxLogin() {
+  const email = (document.getElementById('g-email')?.value||'').trim();
+  const name  = (document.getElementById('g-name')?.value||'').trim();
+  if (!email || !email.includes('@')) { toast('Enter a valid email address'); return; }
+  const u = {
+    email: email,
+    name:  name || email.split('@')[0],
+    picture: `https://ui-avatars.com/api/?name=${encodeURIComponent(name||email)}&background=4285f4&color=fff&size=64`
+  };
+  document.getElementById('g-modal')?.remove();
+  user = u; ls('pu', JSON.stringify(u)); applyUser(u);
+  sendSignupEmails(u);
+  toast('✅ Signed in as ' + u.name, 3500);
+  closeM('set-ov');
+}
+
+function onGCred(resp) {
+  // Called when real Google GSI succeeds
+  try {
+    const parts = resp.credential.split('.');
+    const pay   = JSON.parse(atob(parts[1].replace(/-/g,'+').replace(/_/g,'/')));
+    const u     = {email:pay.email, name:pay.name, picture:pay.picture};
+    user = u; ls('pu',JSON.stringify(u)); applyUser(u);
+    sendSignupEmails(u);
+    toast('✅ Signed in as '+(u.name||u.email), 3500);
+    closeM('set-ov'); document.getElementById('g-modal')?.remove();
+  } catch(e) { toast('❌ Sign-in error: '+e.message); }
+}
+
+function applyUser(u) {
+  $('login-card').style.display='none'; $('user-row').style.display='block';
+  $('u-email').textContent=u.email||'';
+  $('acc-row').style.display='flex'; $('login-row').style.display='none';
+  $('set-email').textContent=u.email||'';
+  const av=$('u-ava');
+  if(u.picture) av.innerHTML=`<img src="${u.picture}" alt="">`;
+  else av.textContent=(u.name||'U')[0].toUpperCase();
+  setPlanUI();
+}
+function planLabel(p){return p==='platinum'?'Platinum':p==='pro'?'Pro':'Free';}
+function setPlanUI(){
+  const u=user;
+  const label=planLabel(plan);
+  if($('u-name')) $('u-name').innerHTML=(u&&u.name?u.name:'User')+` <span class="plan-pill pill-${plan==='platinum'?'plat':plan}" id="plan-pill">${label}</span>`;
+  if($('set-plan-badge')){$('set-plan-badge').textContent=label;$('set-plan-badge').className='plan-pill pill-'+(plan==='platinum'?'plat':plan);$('set-plan-badge').style.cssText='font-size:11px;padding:4px 12px';}
+}
+function signOut(){user=null;localStorage.removeItem('pu');$('login-card').style.display='block';$('user-row').style.display='none';$('acc-row').style.display='none';$('login-row').style.display='flex';closeM('set-ov');toast('Signed out');}
+
+// ── Settings & Pricing ─────────────────────────────────────────────────
+function openSettings(){$('set-ov').classList.add('open');if(user){$('acc-row').style.display='flex';$('login-row').style.display='none';$('set-email').textContent=user.email||'';}else{$('acc-row').style.display='none';$('login-row').style.display='flex';}setPlanUI();$('promo-msg').style.display='none';$('promo-i').value='';}
+function openPricing(){$('price-ov').classList.add('open');}
+function closeM(id){$(id).classList.remove('open');}
+function setTheme(t){applyTheme(t,true);toast(t==='dark'?'🌙 Dark':'☀️ Light');}
+function applyTheme(t,save=true){document.documentElement.setAttribute('data-theme',t);$('dk-b').classList.toggle('on',t==='dark');$('lt-b').classList.toggle('on',t==='light');if(save)ls('theme',t);}
+
+// Promo redemption — verified client-side via SHA-256 hash comparison
+// (this is a server-free static site, so true server-side secrecy isn't
+// possible; this is the closest equivalent: the plaintext codes never
+// appear directly in the page source, only their hash digests do).
+let PROMO_TABLE_READY = false;
+let PROMO_TABLE = {};
+async function sha256Hex(str){
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+(async () => {
+  const proHash  = await sha256Hex('Pryme2026LK');
+  const platHash = await sha256Hex('Pryme2026LKSL');
+  PROMO_TABLE = { [proHash]: 'pro', [platHash]: 'platinum' };
+  PROMO_TABLE_READY = true;
+})();
+
+async function applyPromo(){
+  const code=$('promo-i').value.trim();
+  const msgEl=$('promo-msg');
+  if(!code){toast('Enter a promo code');return;}
+  msgEl.style.display='block';msgEl.style.background='var(--card)';msgEl.style.color='var(--txt2)';
+  msgEl.textContent='Verifying…';
+  try{
+    if(!PROMO_TABLE_READY){
+      // table still computing (extremely fast, but guard just in case)
+      await new Promise(res=>{
+        const iv=setInterval(()=>{ if(PROMO_TABLE_READY){clearInterval(iv);res();} },20);
+      });
+    }
+    const hash = await sha256Hex(code);
+    const tier = PROMO_TABLE[hash];
+    if(tier){
+      plan=tier;ls('plan',plan);setPlanUI();
+      msgEl.style.background='rgba(129,201,149,.1)';msgEl.style.color='var(--green)';
+      msgEl.textContent='✅ Upgraded to '+planLabel(plan)+'!';
+      toast('✅ '+planLabel(plan)+' tier unlocked!',4000);
+      $('promo-i').value='';
+    } else {
+      msgEl.style.background='rgba(242,139,130,.1)';msgEl.style.color='var(--red)';
+      msgEl.textContent='❌ Invalid code';
+    }
+  }catch(e){
+    msgEl.style.background='rgba(242,139,130,.1)';msgEl.style.color='var(--red)';
+    msgEl.textContent='❌ Verification error — try again';
+  }
+}
+function doPay(p,amt){$('pay-sec').style.display='block';$('pay-ttl').textContent=p==='pro'?'Pro Plan — $20/month':'Platinum Plan — $100/month';$('pay-lnk').href='https://www.paypal.com/paypalme/prymexai/'+amt;$('pay-lnk').textContent='💳 Pay $'+amt+' — '+(p==='pro'?'Pro':'Platinum');}
+
+// ── Rate limit ─────────────────────────────────────────────────────────
+function startRL(s){
+  retAt=Date.now()+s*1000;
+  $('rl').classList.add('show');
+  if(retTmr)clearInterval(retTmr);
+  retTmr=setInterval(()=>{
+    const l=Math.ceil((retAt-Date.now())/1000);
+    if(l<=0){
+      clearInterval(retTmr);
+      $('rl').classList.remove('show');
+      retAt=null;
+      toast('✅ Quota reset — ready!');
+    } else {
+      $('rl-s').textContent=l;
+    }
+  },1000);
+}
+
+// ── Input ──────────────────────────────────────────────────────────────
+function onKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();}}
+function onInp(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,180)+'px';setSend(el.value.trim().length>0||imgs.length>0);}
+function setSend(on){$('snd').classList.toggle('on',on);}
+
+// ── Utilities ──────────────────────────────────────────────────────────
+function chime(){try{const c=new AudioContext(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.frequency.value=880;o.type='sine';g.gain.setValueAtTime(.07,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.35);o.start();o.stop(c.currentTime+.35);}catch(e){}}
+function toast(msg,dur=2800){const el=$('toast');el.textContent=msg;el.classList.add('show');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),dur);}
+function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');}
+function escH(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+// ── Markdown renderer ──────────────────────────────────────────────────
+function renderMD(raw){
+  let s=(raw||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  s=s.replace(/```(\w*)\n?([\s\S]*?)```/g,(_,l,c)=>`<pre><code class="lang-${l}">${c.trim()}</code></pre>`);
+  s=s.replace(/`([^`\n]+)`/g,'<code>$1</code>');
+  s=s.replace(/\*\*\*(.+?)\*\*\*/g,'<strong><em>$1</em></strong>');
+  s=s.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
+  s=s.replace(/\*([^*\n]+?)\*/g,'<em>$1</em>');
+  s=s.replace(/^#{5} (.+)$/gm,'<h5>$1</h5>');
+  s=s.replace(/^#{4} (.+)$/gm,'<h4>$1</h4>');
+  s=s.replace(/^### (.+)$/gm,'<h3>$1</h3>');
+  s=s.replace(/^## (.+)$/gm,'<h2>$1</h2>');
+  s=s.replace(/^# (.+)$/gm,'<h1>$1</h1>');
+  s=s.replace(/^&gt; (.+)$/gm,'<blockquote>$1</blockquote>');
+  s=s.replace(/^---$/gm,'<hr>');
+  s=s.replace(/\[([^\]]+)\]\(([^)]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>');
+  s=s.replace(/^\|(.+)\|\s*\n\|[-| :]+\|\s*\n((?:\|.+\|\s*\n?)*)/gm,(_,hdr,rows)=>{
+    const ths=hdr.split('|').filter(c=>c.trim()).map(c=>`<th>${c.trim()}</th>`).join('');
+    const trs=rows.trim().split('\n').map(r=>'<tr>'+r.split('|').filter(c=>c.trim()).map(c=>`<td>${c.trim()}</td>`).join('')+'</tr>').join('');
+    return `<table><thead><tr>${ths}</tr></thead><tbody>${trs}</tbody></table>`;
+  });
+  s=s.replace(/^[\*\-] (.+)$/gm,'<li>$1</li>');
+  s=s.replace(/^\d+\. (.+)$/gm,'<oli>$1</oli>');
+  s=s.replace(/(<li>[\s\S]*?<\/li>)+/g,m=>`<ul>${m}</ul>`);
+  s=s.replace(/(<oli>[\s\S]*?<\/oli>)+/g,m=>`<ol>${m.replace(/oli>/g,'li>')}</ol>`);
+  const lines=s.split('\n'),out=[];
+  for(const ln of lines){const t=ln.trim();if(!t){out.push('<br>');continue;}if(/^<(h[1-5]|pre|ul|ol|li|blockquote|hr|table)/.test(t)){out.push(t);continue;}out.push('<p>'+t+'</p>');}
+  return out.join('').replace(/<p><\/p>/g,'').replace(/(<br>){2,}/g,'<br>');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,4 @@
+# IMPORTANT: These files contain secrets — never commit to GitHub
+.env
+node_modules/
+*.log

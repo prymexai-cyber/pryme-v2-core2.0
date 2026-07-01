@@ -1,0 +1,16 @@
+{
+  "name": "pryme-2-backend",
+  "version": "1.0.0",
+  "description": "Pryme 2.0 secure backend proxy — keeps Gemini API key server-side",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "node-fetch": "^2.7.0"
+  }
+}
