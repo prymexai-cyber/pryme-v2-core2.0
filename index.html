@@ -338,36 +338,70 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
 .sb.closed .sb-head,.sb.closed .sb-nav,.sb.closed .hist-list,.sb.closed .sb-foot{opacity:0;pointer-events:none}
 
 @media(max-width:768px){
-  :root{--sbw:260px}
-  .sb{position:fixed;top:0;left:0;z-index:200;height:100vh;transform:translateX(-100%);transition:transform .28s cubic-bezier(.4,0,.2,1);box-shadow:4px 0 24px rgba(0,0,0,.35)}
-  .sb.open{transform:translateX(0)}
-  .sb-overlay{display:none;position:fixed;inset:0;z-index:199;background:rgba(0,0,0,.55);backdrop-filter:blur(2px)}
-  .sb.open~.sb-overlay{display:block}
-  #main{width:100vw}
+  /* ── ROOT FIX: sidebar out of flex flow on mobile ── */
+  #sb{
+    position:fixed!important;
+    top:0!important;left:0!important;bottom:0!important;
+    z-index:500!important;
+    width:min(280px,80vw)!important;
+    min-width:0!important;
+    height:100dvh!important;
+    transform:translateX(-100%)!important;
+    transition:transform .28s cubic-bezier(.4,0,.2,1)!important;
+    box-shadow:6px 0 32px rgba(0,0,0,.6)!important;
+  }
+  #sb.open{
+    transform:translateX(0)!important;
+  }
+  /* #main fills full viewport — no sidebar eating space */
+  #main{
+    width:100vw!important;
+    max-width:100vw!important;
+    flex:unset!important;
+    position:fixed!important;
+    inset:0!important;
+    height:100dvh!important;
+  }
+  /* Dim overlay behind open sidebar */
+  .sb-overlay{
+    display:none;
+    position:fixed;inset:0;
+    z-index:499;
+    background:rgba(0,0,0,.65);
+    backdrop-filter:blur(4px);
+    -webkit-backdrop-filter:blur(4px);
+  }
+  #sb.open~.sb-overlay,
+  #sb.open+* .sb-overlay{display:block!important}
+  /* Content adjustments */
   .cgrid{grid-template-columns:1fr 1fr!important;gap:10px!important}
-  .wh{font-size:clamp(1.4rem,5vw,2.2rem)!important}
-  .ws{font-size:.85rem!important}
-  .msgs{padding:16px 12px 16px!important}
+  .wh{font-size:clamp(1.35rem,5vw,2.1rem)!important}
+  .ws{font-size:.84rem!important}
+  .msgs{padding:14px 10px!important}
   .topbar{padding:8px 12px!important}
-  .modal{margin:12px!important;max-width:calc(100vw - 24px)!important}
+  .ov>div,.modal{max-width:calc(100vw - 20px)!important;margin:10px auto!important}
 }
 @media(max-width:480px){
-  :root{--sbw:82vw}
+  #sb{width:84vw!important}
   .cgrid{grid-template-columns:1fr!important;gap:8px!important}
-  .wh{font-size:1.35rem!important}
-  .ws{font-size:.8rem!important}
-  .ccard{padding:14px 12px!important}
-  .ce{font-size:22px!important}
-  .ct{font-size:.82rem!important}
-  .cd{font-size:.73rem!important}
-  .chips{gap:6px!important}
-  .chip{font-size:.75rem!important;padding:7px 11px!important}
+  .wh{font-size:1.25rem!important}
+  .ws{font-size:.78rem!important}
+  .ccard{padding:12px 11px!important}
+  .ce{font-size:20px!important}
+  .ct{font-size:.8rem!important}
+  .cd{font-size:.71rem!important}
+  .chips{gap:5px!important}
+  .chip{font-size:.73rem!important;padding:6px 10px!important}
   .ta-wrap{padding:8px 10px!important}
-  #ta{font-size:.88rem!important}
+  #ta{font-size:.86rem!important}
   .sbtn{width:34px!important;height:34px!important}
   .ai-av{width:28px!important;height:28px!important;font-size:11px!important}
   .topbar{padding:6px 10px!important}
-  .modal{max-width:96vw!important;border-radius:18px!important}
+  .ov>div{max-width:96vw!important;border-radius:16px!important}
+  /* iPhone notch / home indicator safe areas */
+  @supports(padding:env(safe-area-inset-bottom)){
+    .ta-wrap{padding-bottom:calc(8px + env(safe-area-inset-bottom))!important}
+  }
 }
 @media(max-height:500px) and (orientation:landscape){
   #welcome{padding:20px!important}
@@ -378,6 +412,18 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
   .ta-wrap{padding-bottom:calc(12px + env(safe-area-inset-bottom))!important}
 }
 
+
+/* ── VOICE BUTTON ─────────────────────────────── */
+.vbtn-listening{
+  animation: voicePulse 1s ease-in-out infinite;
+  background: rgba(234,67,53,.18)!important;
+  color: var(--red)!important;
+}
+@keyframes voicePulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(234,67,53,.4)}
+  50%{box-shadow:0 0 0 8px rgba(234,67,53,0)}
+}
+.tts-active{color:var(--blue)!important}
 </style>
 </head>
 <body>
@@ -1066,6 +1112,12 @@ function addAI(txt,figData,eng,simulated){
   }
   d.innerHTML=`<div class="ai-av">${pxLogo(34)}</div><div class="ai-body"><div class="ai-sndr">Pryme 2.0 <span class="ai-bdg${simulated?' degraded':''}">${simulated?'⚠️ Degraded mode':escH(eng||'AI')}</span></div><div class="md">${renderMD(txt)}${fc}</div><div class="acts"><button class="abtn" onclick="cpMsg(this)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg> Copy</button><button class="abtn" onclick="factChk(this)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg> Verify</button><button class="abtn" onclick="retryM(this)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg> Retry</button><button class="abtn" onclick="thumbU(this)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z"/></svg></button><button class="abtn" onclick="thumbD(this)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M15 3H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v2c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L10.83 23l6.59-6.59c.36-.36.58-.86.58-1.41V5c0-1.1-.9-2-2-2zm4 0v12h4V3h-4z"/></svg></button><button class="abtn" onclick="readOut(this)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg> Read</button></div></div>`;
   d.querySelectorAll('pre').forEach(pre=>{const b=document.createElement('button');b.className='cpbtn';b.textContent='Copy';b.onclick=()=>{navigator.clipboard.writeText(pre.querySelector('code')?.innerText||pre.innerText);b.textContent='Copied!';setTimeout(()=>b.textContent='Copy',2200);};pre.appendChild(b);});
+  // Add TTS speaker button to AI message
+  const ttsBtn = document.createElement('button');
+  ttsBtn.className='ib tts-btn';ttsBtn.title='Read aloud';ttsBtn.style.cssText='margin-top:6px;opacity:.6;';
+  ttsBtn.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>';
+  ttsBtn.onclick = () => { speakText(txt); ttsBtn.classList.toggle('tts-active'); };
+  d.querySelector('.ai-body')?.appendChild(ttsBtn);
   w.appendChild(d);scrollD();
 }
 
@@ -1095,19 +1147,99 @@ async function onFileAtt(inp){const f=inp.files[0];if(!f)return;const t=await f.
 function toB64(f){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(',')[1]);r.onerror=rej;r.readAsDataURL(f);});}
 
 // ── Voice (Web Speech API — multilingual auto-detect) ──────────────────
-function toggleVoice(){recOn?stopVoice():startVoice();}
-function startVoice(){
-  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if(!SR){toast('Voice not supported. Use Chrome.');return;}
-  recog=new SR();recog.continuous=false;recog.interimResults=true;
-  recog.lang=gl('vlng')||'';  // empty = browser auto-detects language
-  recog.onstart=()=>{recOn=true;$('mic-btn').classList.add('rec');$('vstrip').classList.add('on');$('vlbl').textContent=recog.lang?'Listening ('+recog.lang+')…':'Listening (auto-detect)…';};
-  recog.onresult=e=>{const t=Array.from(e.results).map(r=>r[0].transcript).join('');$('ta').value=t;onInp($('ta'));$('vlbl').textContent=t.slice(0,70)||'Listening…';};
-  recog.onspeechend=()=>recog.stop();
-  recog.onend=()=>{recOn=false;$('mic-btn').classList.remove('rec');$('vstrip').classList.remove('on');recog=null;if($('ta').value.trim())sendMsg();};
-  recog.onerror=e=>{stopVoice();toast('Voice error: '+e.error);};
+function toggleVoice(){
+  // Speech-to-Text via Web Speech API (no API key, works on Chrome/Edge/Safari)
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SpeechRecognition){
+    toast('❌ Voice input not supported in this browser. Use Chrome or Edge.');
+    return;
+  }
+  const vbtn = $('vbtn');
+  if(recOn){
+    if(recog){ recog.stop(); }
+    recOn = false;
+    if(vbtn) vbtn.classList.remove('vbtn-listening');
+    return;
+  }
+  recog = new SpeechRecognition();
+  recog.lang = 'en-US';          // detects Sinhala too on supported devices
+  recog.continuous = false;
+  recog.interimResults = true;
+  recog.maxAlternatives = 1;
+
+  recog.onstart = () => {
+    recOn = true;
+    if(vbtn) vbtn.classList.add('vbtn-listening');
+    toast('🎙️ Listening… speak now');
+  };
+  recog.onresult = (e) => {
+    let interim = '', final = '';
+    for(let i = e.resultIndex; i < e.results.length; i++){
+      const t = e.results[i][0].transcript;
+      e.results[i].isFinal ? (final += t) : (interim += t);
+    }
+    const ta = $('ta');
+    if(ta) ta.value = final || interim;
+    if(final){
+      recOn = false;
+      if(vbtn) vbtn.classList.remove('vbtn-listening');
+      sendMsg();  // auto-send on final transcript
+    }
+  };
+  recog.onerror = (e) => {
+    recOn = false;
+    if(vbtn) vbtn.classList.remove('vbtn-listening');
+    const msgs = {
+      'not-allowed': '❌ Microphone permission denied — allow mic access in browser settings',
+      'no-speech':   '⚠️ No speech detected — try again',
+      'network':     '❌ Network error during voice recognition',
+    };
+    toast(msgs[e.error] || '❌ Voice error: ' + e.error);
+  };
+  recog.onend = () => {
+    recOn = false;
+    if(vbtn) vbtn.classList.remove('vbtn-listening');
+  };
   recog.start();
 }
+
+// Text-to-Speech — read AI responses aloud
+let ttsActive = false;
+function speakText(text){
+  if(!window.speechSynthesis){ toast('❌ TTS not supported in this browser'); return; }
+  // Cancel any ongoing speech
+  window.speechSynthesis.cancel();
+  if(ttsActive){ ttsActive = false; return; }
+  // Strip markdown for cleaner speech
+  const clean = text
+    .replace(/```[\s\S]*?```/g, 'code block')
+    .replace(/\*\*(.*?)\*\*/g, '$1')
+    .replace(/\*(.*?)\*/g, '$1')
+    .replace(/#{1,6}\s/g, '')
+    .replace(/\[(.*?)\]\(.*?\)/g, '$1')
+    .replace(/---+/g, '')
+    .trim()
+    .slice(0, 4000); // browser TTS limit
+  const utt = new SpeechSynthesisUtterance(clean);
+  utt.rate  = 1.05;
+  utt.pitch = 1.0;
+  utt.volume = 1.0;
+  // Pick a natural voice if available
+  const voices = window.speechSynthesis.getVoices();
+  const preferred = voices.find(v =>
+    v.name.includes('Google') || v.name.includes('Natural') || v.lang === 'en-US'
+  );
+  if(preferred) utt.voice = preferred;
+  utt.onstart = () => { ttsActive = true; };
+  utt.onend   = () => { ttsActive = false; };
+  utt.onerror = () => { ttsActive = false; };
+  window.speechSynthesis.speak(utt);
+}
+// Load voices async (Chrome requires this)
+if(window.speechSynthesis){
+  window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+}
+
 function stopVoice(){if(recog){try{recog.stop();}catch(e){}recog=null;}recOn=false;$('mic-btn').classList.remove('rec');$('vstrip').classList.remove('on');if($('ta').value.trim())setTimeout(sendMsg,300);}
 
 // ── Figma ────────────────────────────────────────────────────────────────
@@ -1207,23 +1339,34 @@ function newChat(){SID=mkSID();imgs=[];$('chat').innerHTML='';$('img-prev').inne
 
 // ── Sidebar toggle ─────────────────────────────────────────────────────
 function toggleSB(){
-  const sb=$('sb');
-  if(window.innerWidth<=768){
-    sb.classList.toggle('open');
-    let ov=document.querySelector('.sb-overlay');
-    if(!ov){ov=document.createElement('div');ov.className='sb-overlay';ov.onclick=()=>toggleSB();document.body.appendChild(ov);}
-    ov.style.display=sb.classList.contains('open')?'block':'none';
+  const sb = $('sb');
+  if(window.innerWidth <= 768){
+    const willOpen = !sb.classList.contains('open');
+    sb.classList.toggle('open', willOpen);
+    // Overlay: must be a sibling of #sb in DOM for CSS ~ selector to work
+    let ov = document.getElementById('mob-overlay');
+    if(!ov){
+      ov = document.createElement('div');
+      ov.id  = 'mob-overlay';
+      ov.className = 'sb-overlay';
+      // Insert immediately after <aside id="sb"> in DOM
+      sb.parentNode.insertBefore(ov, sb.nextSibling);
+    }
+    ov.style.display = willOpen ? 'block' : 'none';
+    if(willOpen) ov.onclick = () => toggleSB();
   } else {
+    // Desktop: animate width to 0
     sb.classList.toggle('closed');
   }
 }
-window.addEventListener('resize',()=>{
-  if(window.innerWidth>768){
-    const sb=$('sb');const ov=document.querySelector('.sb-overlay');
-    if(sb.classList.contains('open'))sb.classList.remove('open');
-    if(ov)ov.style.display='none';
+window.addEventListener('resize', () => {
+  if(window.innerWidth > 768){
+    const sb = $('sb');
+    const ov = document.getElementById('mob-overlay');
+    if(sb.classList.contains('open')) sb.classList.remove('open');
+    if(ov) ov.style.display = 'none';
   }
-});
+}, {passive: true});
 
 // ── Google Login  —  FIXED: no raw 401 errors ──────────────────────────
 function startLogin() {
