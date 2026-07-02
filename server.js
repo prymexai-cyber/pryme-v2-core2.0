@@ -107,13 +107,28 @@ async function callGemini({message, images=[], history=[], maxTokens=8192, useSe
 
   for(const modelName of MODELS) {
     try {
-     // මෙය ඔබගේ server.js හි ඇති කොටසට ආදේශ කරන්න
-const model = genAI.getGenerativeModel({
-  model: "gemini-1.5-flash", // 'models/' කොටස ඉවත් කරන්න
+  // සින්ටැක්ස් දෝෂය නිවැරදි කර ඇති ආකාරය
+const generationConfig = { 
+  temperature: 0.9, 
+  maxOutputTokens: maxTokens, 
+  topP: 0.95, 
+  topK: 40 
+};
+
+// Tool setup වෙනම හඳුනා ගන්න
+const modelConfig = {
+  model: "gemini-1.5-flash", // 'models/' prefix එක ඉවත් කරන්න
   systemInstruction: SYSTEM_INSTRUCTION,
   safetySettings: getSafetySettings(),
-  generationConfig: { temperature: 0.9, maxOutputTokens: 8192, topP: 0.95, topK: 40 },
-});
+  generationConfig: generationConfig
+};
+
+// search tool එක තිබේ නම් පමණක් අමුණන්න
+if (useSearch) {
+  modelConfig.tools = [{ googleSearch: {} }];
+}
+
+const model = genAI.getGenerativeModel(modelConfig);
         // Google Search grounding — gives real-time web access
         ...(useSearch ? {tools: [{googleSearch: {}}]} : {}),
       });
