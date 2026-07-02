@@ -128,7 +128,7 @@ if (useSearch) {
   modelConfig.tools = [{ googleSearch: {} }];
 }
 
-const model = genAI.getGenerativeModel(modelConfig);
+
       // Google Search grounding – gives real-time web access
 if (useSearch) {
   modelConfig.tools = [{ googleSearch: {} }];
