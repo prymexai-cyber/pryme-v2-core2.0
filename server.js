@@ -44,7 +44,7 @@ app.get('/', (req, res) => {
 const GEMINI_KEY = process.env.GEMINI_API_KEY;
 
 // Model cascade — 2.5-flash first (best for most tasks), fallback to lite
-const MODELS = ['models/gemini-1.5-flash'];
+const MODELS = ['gemini-1.5-flash'];
 
 // Lazy-load SDK so server starts even if package not installed yet
 let GoogleGenerativeAI = null;
