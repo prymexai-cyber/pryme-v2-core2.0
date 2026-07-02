@@ -1,6 +1,6 @@
 {
   "name": "pryme-2-backend",
-  "version": "3.0.0",
+  "version": "2.0.0",
   "description": "Pryme 2.0 Production Backend — Gemini SDK + Email + Stripe + WhatsApp",
   "main": "server.js",
   "scripts": { "start": "node server.js" },
