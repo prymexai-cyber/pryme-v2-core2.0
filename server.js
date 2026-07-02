@@ -129,10 +129,13 @@ if (useSearch) {
 }
 
 const model = genAI.getGenerativeModel(modelConfig);
-        // Google Search grounding — gives real-time web access
-        ...(useSearch ? {tools: [{googleSearch: {}}]} : {}),
-      });
+      // Google Search grounding – gives real-time web access
+if (useSearch) {
+  modelConfig.tools = [{ googleSearch: {} }];
+}
 
+// Model instance එක සෑදීම
+const model = genAI.getGenerativeModel(modelConfig);
       // Build the user message parts
       const userParts = [];
 
