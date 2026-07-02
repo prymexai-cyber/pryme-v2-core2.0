@@ -1,15 +1,17 @@
 {
   "name": "pryme-2-backend",
   "version": "2.0.0",
-  "description": "Pryme 2.0 Production Backend — Gemini SDK + Email + Stripe + WhatsApp",
+  "description": "Pryme 2.0 Production Backend — AI + Email + Stripe + WhatsApp + Image Gen",
   "main": "server.js",
-  "scripts": { "start": "node server.js" },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
   "dependencies": {
     "express": "^4.18.2",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "node-fetch": "^2.7.0",
-    "@google/generative-ai": "^0.21.0",
     "nodemailer": "^6.9.7",
     "stripe": "^14.11.0",
     "twilio": "^4.20.1"
