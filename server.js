@@ -44,7 +44,8 @@ app.get('/', (req, res) => {
 const GEMINI_KEY = process.env.GEMINI_API_KEY;
 
 // Model cascade — 2.5-flash first (best for most tasks), fallback to lite
-const MODELS = ['gemini-1.5-flash', 'gemini-1.5-pro'];
+// server.js හි ඇති MODELS ලැයිස්තුව මෙසේ වෙනස් කරන්න:
+const MODELS = ['gemini-1.5-flash', 'gemini-1.5-pro-latest'];
 
 // Lazy-load SDK so server starts even if package not installed yet
 let GoogleGenerativeAI = null;
