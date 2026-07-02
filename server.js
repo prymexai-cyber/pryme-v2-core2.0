@@ -81,3 +81,19 @@ async function callGemini({message, images=[], history=[], maxTokens=8192, useSe
 // ... (ඉතිරි කේත කොටස් එලෙසම තබා ගන්න)
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+
+// Stripe Webhook Handler - මෙය ඔබගේ server.js හි අනිවාර්යයෙන් තිබිය යුතුය
+async function handleStripeWebhook(req, res) {
+  if(!stripe || !process.env.STRIPE_WEBHOOK_SECRET) return res.json({received:true});
+  let event;
+  try {
+    event = stripe.webhooks.constructEvent(req.body, req.headers['stripe-signature'], process.env.STRIPE_WEBHOOK_SECRET);
+  } catch(e) { return res.status(400).json({error:e.message}); }
+  
+  if(event.type === 'checkout.session.completed') {
+    const s = event.data.object;
+    console.log(`[Stripe] ✅ Payment — ${s.customer_email}`);
+  }
+  res.json({received:true});
+}
