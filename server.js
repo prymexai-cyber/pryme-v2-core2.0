@@ -48,7 +48,6 @@ const MODELS = ['gemini-1.5-flash'];
 let GoogleGenerativeAI = null;
 let HarmBlockThreshold = null;
 let HarmCategory = null;
-
 function getSDK() {
   if(GoogleGenerativeAI) return true;
   try {
