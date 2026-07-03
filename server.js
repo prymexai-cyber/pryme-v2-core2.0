@@ -108,6 +108,8 @@ async function callGemini({message, images=[], history=[], maxTokens=8192, useSe
   const genAI = new GoogleGenerativeAI(GEMINI_KEY);
 
   for(const modelName of MODELS) {
+
+    try {
 // 1. API version එක සහ model config එක සැකසීම
       const modelConfig = {
         model: "gemini-1.5-flash",
