@@ -43,10 +43,11 @@ app.get('/', (req, res) => {
 // ══════════════════════════════════════════════════════════════════════════
 const GEMINI_KEY = process.env.GEMINI_API_KEY;
 
-// Model cascade — 2.5-flash first (best for most tasks), fallback to lite
-// image_db2e2f.png හි 47 වන පේළිය මෙසේ වෙනස් කරන්න:
-const MODELS = ['gemini-1.5-flash-latest'];
+// server.js හි 47 වන පේළිය අවට ඇති කොටස මෙලෙස වෙනස් කරන්න
+const MODELS = ['gemini-1.5-flash']; // 'models/' prefix එක ඉවත් කරන්න
 
+// getGenerativeModel අමතන ස්ථානය (modelConfig තුළ)
+model: "gemini-1.5-flash",
 // Lazy-load SDK so server starts even if package not installed yet
 let GoogleGenerativeAI = null;
 let HarmBlockThreshold = null;
