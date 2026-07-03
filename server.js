@@ -129,10 +129,11 @@ async function callGemini({message, images=[], history=[], maxTokens=8192, useSe
       }
 
       // 2. Model instance එක සෑදීම (apiVersion: 'v1' භාවිතා කිරීම)
-      const model = genAI.getGenerativeModel(modelConfig, { apiVersion: 'v1' });
+// 2. Model instance එක සෑදීම
+const model = genAI.getGenerativeModel(modelConfig, { apiVersion: 'v1' });
 
-// Model instance එක සෑදීම
-const model = genAI.getGenerativeModel(modelConfig);
+// Build the user message parts
+const userParts = [];
       // Build the user message parts
       const userParts = [];
 
