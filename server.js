@@ -133,9 +133,8 @@ async function callGemini({message, images=[], history=[], maxTokens=8192, useSe
 const model = genAI.getGenerativeModel(modelConfig, { apiVersion: 'v1' });
 
 // Build the user message parts
+// Build the user message parts
 const userParts = [];
-      // Build the user message parts
-      const userParts = [];
 
       // Add images if provided (multimodal input)
       for(const img of images) {
