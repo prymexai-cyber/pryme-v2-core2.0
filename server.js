@@ -127,19 +127,14 @@ if (useSearch) {
 // 2. Model instance එක සෑදීම
 // 2. Model instance එක සෑදීම
 // apiVersion වෙන්ව නොයවා, modelConfig එක තුළටම හෝ සෘජුවම යොමු කරන්න
+// නිවැරදි Model instance එක සෑදීම
 const model = genAI.getGenerativeModel({
-  model: "gemini-1.5-flash",
-  systemInstruction: SYSTEM_INSTRUCTION,
-  // tools ඇත්තේ නම් මෙතැනට එකතු කරන්න
-  tools: useSearch ? [{ googleSearch: {} }] : undefined,
-  safetySettings: getSafetySettings(),
-  generationConfig: {
-    temperature: 0.9,
-    maxOutputTokens: maxTokens,
-    topP: 0.95,
-    topK: 40
-  }
+    model: "gemini-1.5-flash",
+    systemInstruction: SYSTEM_INSTRUCTION
 });
+
+// සෙවුම් මෙවලම භාවිතා කරන්නේ නම් පමණක් එය අමුණන්න
+// සටහන: tools සඳහා වෙනම වින්‍යාසයක් අවශ්‍ය විය හැක
 // Build the user message parts
 // Build the user message parts
 const userParts = [];
