@@ -43,9 +43,7 @@ app.get('/', (req, res) => {
 // ══════════════════════════════════════════════════════════════════════════
 const GEMINI_KEY = process.env.GEMINI_API_KEY;
 
-// server.js හි 47 වන පේළිය අවට ඇති කොටස මෙලෙස වෙනස් කරන්
-46: // Available Gemini Models
-47: const MODELS = ['gemini-1.5-flash'];
+const MODELS = ['gemini-1.5-flash'];
 
 let GoogleGenerativeAI = null;
 let HarmBlockThreshold = null;
