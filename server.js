@@ -106,27 +106,26 @@ async function callGemini({message, images=[], history=[], maxTokens=8192, useSe
 
     try {
 // 1. API version එක සහ model config එක සැකසීම
-      const modelConfig = {
-        model: "gemini-1.5-flash",
-        systemInstruction: SYSTEM_INSTRUCTION,
-        safetySettings: getSafetySettings(),
-        generationConfig: { 
-          temperature: 0.9, 
-          maxOutputTokens: maxTokens, 
-          topP: 0.95, 
-          topK: 40 
-        }
-      };
+    // 1. API version සහ model config සැකසීම
+const modelConfig = {
+  model: "gemini-1.5-flash",
+  systemInstruction: SYSTEM_INSTRUCTION, // මෙය මෙහි තිබීම අනිවාර්යයි
+  safetySettings: getSafetySettings(),
+  generationConfig: {
+    temperature: 0.9,
+    maxOutputTokens: maxTokens,
+    topP: 0.95,
+    topK: 40
+  }
+};
 
-      // search tool එක තිබේ නම් පමණක් අමුණන්න
-      if (useSearch) {
-        modelConfig.tools = [{ googleSearch: {} }];
-      }
+// search tool එක තිබේ නම් පමණක් අමුණන්න
+if (useSearch) {
+  modelConfig.tools = [{ googleSearch: {} }];
+}
 
-      // 2. Model instance එක සෑදීම (apiVersion: 'v1' භාවිතා කිරීම)
 // 2. Model instance එක සෑදීම
 const model = genAI.getGenerativeModel(modelConfig, { apiVersion: 'v1' });
-
 // Build the user message parts
 // Build the user message parts
 const userParts = [];
